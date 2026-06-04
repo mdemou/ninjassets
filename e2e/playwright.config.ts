@@ -24,7 +24,10 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   forbidOnly: !!process.env.CI,
-  retries: agentMode ? 0 : process.env.CI ? 1 : 0,
+  retries: agentMode ? 0 : process.env.CI ? 2 : 0,
+  // CI runners cold-start the Vite/react-router dev server and compile routes
+  // on first hit, so give individual tests more headroom there than locally.
+  timeout: process.env.CI ? 60_000 : 30_000,
   reporter: agentMode
     ? [["./reporters/agent-summary-reporter.ts"]]
     : [

@@ -78,14 +78,18 @@ test.describe('Admin QR print page', () => {
     await page.getByRole('button', { name: /sign in/i }).click();
     await page.waitForURL(/\/(admin\/overview|dashboard)/);
 
+    // Land on the print page first so the document context is stable before we
+    // touch sessionStorage. Seeding right after waitForURL can race a post-login
+    // redirect still in flight and destroy the execution context mid-evaluate.
+    await page.goto('/admin/assets/print-qr');
     await page.evaluate(
       ([key, item]) => {
         sessionStorage.setItem(key, JSON.stringify([item]));
       },
       [QR_PRINT_STORAGE_KEY, PRINT_ITEM] as const,
     );
+    await page.reload();
 
-    await page.goto('/admin/assets/print-qr');
     await expect(page.getByRole('heading', { name: /print qr labels/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /print labels/i })).toBeVisible();
     await expect(page.getByText(PRINT_ITEM.name)).toBeVisible();
@@ -102,11 +106,14 @@ test.describe('Admin QR print page', () => {
     await page.getByRole('button', { name: /sign in/i }).click();
     await page.waitForURL(/\/(admin\/overview|dashboard)/);
 
+    // Settle on the print page before clearing storage (see note above), then
+    // reload so the page mounts with an empty selection.
+    await page.goto('/admin/assets/print-qr');
     await page.evaluate((key) => {
       sessionStorage.removeItem(key);
     }, QR_PRINT_STORAGE_KEY);
+    await page.reload();
 
-    await page.goto('/admin/assets/print-qr');
     await expect(page.getByText(/no assets selected for printing/i)).toBeVisible();
   });
 });
