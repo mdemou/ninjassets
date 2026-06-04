@@ -127,7 +127,7 @@ test.describe('REQ-AUTH-001: Self-registration and email verification', () => {
         page.goto(`/verify-email?token=${token}`),
       ]);
       expect(verifyResponse.status()).toBeLessThan(400);
-      await expect(page.locator('.bg-success')).toBeVisible();
+      await expect(page.getByText(/your email has been verified successfully/i)).toBeVisible();
 
       const activated = await findUser(EMAIL);
       expect(activated?.status).toBe('ACTIVE');
@@ -141,8 +141,11 @@ test.describe('REQ-AUTH-001: Self-registration and email verification', () => {
     });
 
     test('an invalid token reports an error', async ({ page }) => {
-      await page.goto('/verify-email?token=not-a-real-token');
-      await expect(page.locator('.bg-danger')).toBeVisible();
+      // A well-formed (64-char) but non-existent token exercises the domain's
+      // invalid-token rejection rather than the input-length validation.
+      const bogusToken = 'a'.repeat(64);
+      await page.goto(`/verify-email?token=${bogusToken}`);
+      await expect(page.getByText(/invalid or expired verification token/i)).toBeVisible();
     });
   });
 });
