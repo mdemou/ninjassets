@@ -1,0 +1,7 @@
+---
+description: How to create and structure Knex database migrations in the backend
+globs: backend/migrations/**/*
+alwaysApply: false
+---
+
+**Read `backend/docs/database-migrations.md` before doing anything — it contains all patterns, conventions, and examples for this rule.**

@@ -1,0 +1,10 @@
+---
+description: How to run and develop Playwright E2E tests — read docs/e2e-testing.md
+alwaysApply: true
+---
+
+**Read `docs/e2e-testing.md` before doing anything — it contains all patterns, conventions, and examples for this rule.**
+
+**npm scripts:** `e2e/README.md`.
+
+**Automated agents:** always run E2E from `e2e/` with `npm run test:agent`.

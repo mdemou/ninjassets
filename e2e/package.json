@@ -1,0 +1,25 @@
+{
+  "name": "ninjasset-e2e",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "db:setup": "npx tsx scripts/create-test-db.ts",
+    "test": "npx tsx scripts/create-test-db.ts && npx playwright test",
+    "test:ui": "npx tsx scripts/create-test-db.ts && npx playwright test --ui",
+    "test:headed": "npx tsx scripts/create-test-db.ts && npx playwright test --headed",
+    "test:report": "playwright show-report",
+    "test:agent": "E2E_AGENT=1 npx tsx scripts/create-test-db.ts && E2E_AGENT=1 npx playwright test --max-failures=1",
+    "install:browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/pg": "^8.11.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.0",
+    "ioredis": "^5.11.0",
+    "pg": "^8.11.0",
+    "tsx": "^4.7.0"
+  }
+}

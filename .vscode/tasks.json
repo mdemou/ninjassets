@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev:preflight",
+      "type": "shell",
+      "command": "bash .vscode/dev-preflight.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-preflight"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

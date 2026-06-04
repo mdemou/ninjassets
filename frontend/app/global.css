@@ -1,0 +1,444 @@
+@import '@fontsource/urbanist/300.css';
+@import '@fontsource/urbanist/400.css';
+@import '@fontsource/urbanist/500.css';
+@import '@fontsource/urbanist/600.css';
+@import '@fontsource/urbanist/700.css';
+
+@import 'react-loading-skeleton/dist/skeleton.css';
+
+@import 'tailwindcss';
+@config "../tailwind.config.ts";
+
+:root {
+  /* Brand */
+  --color-primary: #109461;
+  --color-secondary: #152418;
+  --color-neutral: #000000;
+  --color-neutral2: #ffffff;
+
+  /* Primary scale */
+  --color-primary-x-dark: #075c39;
+  --color-primary-dark: #097347;
+  --color-primary-hover: #0b8053;
+  --color-primary-light: #12a870;
+  --color-primary-x-light: #4dc492;
+  --color-primary-2x-light: #d1efe3;
+  --color-primary-pale: #b8e5d1;
+
+  /* Secondary scale */
+  --color-secondary-x-dark: #0c140f;
+  --color-secondary-dark: #101a13;
+  --color-secondary-hover: #1d3224;
+  --color-secondary-light: #1f3829;
+  --color-secondary-x-light: #2a4a38;
+  --color-secondary-2x-light: #eef1ef;
+
+  /* Asset status: in stock (distinct from brand greens) */
+  --color-status-stock: #6366f1;
+  --color-status-stock-light: #e8eaff;
+  --color-status-stock-dark: #4338ca;
+
+  /* Asset status: maintenance (attention / work in progress) */
+  --color-status-maintenance: #ea580c;
+  --color-status-maintenance-light: #ffedd5;
+  --color-status-maintenance-dark: #9a3412;
+
+  /* Asset status: archived (inactive / retired) */
+  --color-status-archived: #64748b;
+  --color-status-archived-light: #e8eef3;
+  --color-status-archived-dark: #475569;
+
+  /* User account status */
+  --color-user-status-active: #0d9762;
+  --color-user-status-active-light: #d1efe3;
+  --color-user-status-active-dark: #097347;
+  --color-user-status-inactive: #94a3b8;
+  --color-user-status-inactive-light: #f1f5f9;
+  --color-user-status-inactive-dark: #64748b;
+
+  /* User role */
+  --color-user-role-admin: #7c3aed;
+  --color-user-role-admin-light: #ede9fe;
+  --color-user-role-admin-dark: #5b21b6;
+  --color-user-role-user: #0284c7;
+  --color-user-role-user-light: #e0f2fe;
+  --color-user-role-user-dark: #0369a1;
+
+  /* Semantic */
+  --color-danger: #dc3545;
+  --color-danger-hover: #c82333;
+  --color-success: #0d9762;
+  --color-warning: #e6a817;
+  --color-info: #0d9762;
+
+  /* Surface & neutrals */
+  --color-surface: #f4f4f4;
+  --color-surface-alt: #fafafa;
+  --color-card: var(--color-neutral2);
+  --color-border: #e5e5e5;
+  --color-input: var(--color-neutral2);
+  --color-foreground: var(--color-neutral);
+  --color-muted: #5c5c5c;
+  --color-gray-950: var(--color-neutral);
+
+  /* Sidebar */
+  --color-sidebar-bg: #f7f8f9;
+  --color-sidebar-border: #e4e7eb;
+  --color-sidebar-text: #5f6b7a;
+  --color-sidebar-text-muted: #8b95a5;
+  --color-sidebar-text-hover: #1a2332;
+  --color-sidebar-hover-bg: #eef0f3;
+  --color-sidebar-active-bg: #e3f3ec;
+  --color-sidebar-active-text: #0b7a4f;
+}
+
+/* Base */
+html {
+  color: var(--color-foreground);
+  background-color: var(--color-surface);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar — neutral surface, primary accent on active (overrides global link color) */
+.sidebar {
+  background-color: var(--color-sidebar-bg);
+  color: var(--color-sidebar-text);
+  border-color: var(--color-sidebar-border);
+  font-weight: 400;
+  box-shadow: 2px 0 16px rgb(26 35 50 / 0.04);
+}
+
+.sidebar a {
+  color: var(--color-sidebar-text);
+}
+
+.sidebar a:hover {
+  text-decoration: none;
+  color: var(--color-sidebar-text-hover);
+}
+
+.sidebar a.sidebar-link-active {
+  color: var(--color-sidebar-active-text);
+}
+
+.sidebar .sidebar-admin-label {
+  color: var(--color-sidebar-text-muted);
+}
+
+.sidebar .sidebar-section-toggle {
+  color: var(--color-sidebar-text-muted);
+}
+
+.sidebar .sidebar-section-toggle:hover {
+  color: var(--color-sidebar-text-hover);
+}
+
+.sidebar .sidebar-collapse-btn {
+  color: var(--color-sidebar-text);
+}
+
+.sidebar .sidebar-collapse-btn:hover {
+  color: var(--color-sidebar-text-hover);
+}
+
+/* Navbar - same background as sidebar, white text */
+.navbar a {
+  /* color: white; */
+}
+
+.navbar a:hover {
+  text-decoration: none;
+}
+
+/* Table headers - distinct background */
+table thead tr {
+  background-color: color-mix(in srgb, var(--color-primary-2x-light) 50%, transparent);
+}
+
+/* Table cells - horizontal padding for header and body rows */
+table th,
+table td {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Slot admin tooltip - ? icon and popup */
+.slot-tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-neutral2);
+  background: var(--color-primary-light);
+  border-radius: 9999px;
+}
+
+.slot-tooltip-popup {
+  background: var(--color-primary-2x-light);
+  color: var(--color-foreground);
+}
+
+/* Docs prose — markdown rendered content */
+.docs-prose {
+  color: var(--color-foreground);
+  line-height: 1.75;
+  font-size: 0.9375rem;
+}
+
+.docs-prose h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--color-foreground);
+}
+
+.docs-prose h2 {
+  font-size: 1.375rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-foreground);
+}
+
+.docs-prose h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-foreground);
+}
+
+.docs-prose h4 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.docs-prose p {
+  margin-bottom: 1.125rem;
+  color: color-mix(in srgb, var(--color-foreground) 85%, transparent);
+}
+
+.docs-prose > p:first-of-type {
+  font-size: 1.0625rem;
+  color: var(--color-muted);
+}
+
+.docs-prose blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding: 0.75rem 1rem;
+  margin: 1.25rem 0;
+  background-color: var(--color-primary-2x-light);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--color-primary-x-dark);
+  font-size: 0.9375rem;
+}
+
+.docs-prose blockquote p {
+  margin: 0;
+  color: inherit;
+}
+
+.docs-prose a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+}
+
+.docs-prose a:hover {
+  color: var(--color-primary-dark);
+}
+
+.docs-prose code {
+  font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+  font-size: 0.8125rem;
+  background-color: var(--color-primary-2x-light);
+  color: var(--color-primary-x-dark);
+  padding: 0.15em 0.45em;
+  border-radius: 0.3rem;
+  border: 1px solid var(--color-primary-pale);
+}
+
+.docs-prose pre {
+  background-color: var(--color-secondary-dark);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  border: 1px solid var(--color-secondary-light);
+}
+
+.docs-prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #e2e8f0;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.docs-prose ul,
+.docs-prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.125rem;
+}
+
+.docs-prose ul {
+  list-style-type: disc;
+}
+
+.docs-prose ol {
+  list-style-type: decimal;
+}
+
+.docs-prose li {
+  margin-bottom: 0.35rem;
+  color: color-mix(in srgb, var(--color-foreground) 85%, transparent);
+}
+
+.docs-table-scroll {
+  margin: 1.25rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+}
+
+.docs-table-scroll table {
+  width: 100%;
+  min-width: 36rem;
+  margin: 0;
+  table-layout: auto;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .docs-table-scroll table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  /* Fixed column widths by column count (aligned across tables on md+). */
+  .docs-table-scroll table:has(thead th:nth-child(2):last-child) :is(th, td):nth-child(1) {
+    width: 32%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(2):last-child) :is(th, td):nth-child(2) {
+    width: 68%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(3):last-child) :is(th, td):nth-child(1) {
+    width: 24%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(3):last-child) :is(th, td):nth-child(2) {
+    width: 46%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(3):last-child) :is(th, td):nth-child(3) {
+    width: 30%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(4):last-child) :is(th, td):nth-child(1) {
+    width: 34%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(4):last-child) :is(th, td):nth-child(2) {
+    width: 22%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(4):last-child) :is(th, td):nth-child(3) {
+    width: 22%;
+  }
+  .docs-table-scroll table:has(thead th:nth-child(4):last-child) :is(th, td):nth-child(4) {
+    width: 22%;
+  }
+}
+
+.docs-prose table thead tr {
+  background-color: var(--color-surface);
+}
+
+.docs-prose table th {
+  font-weight: 600;
+  text-align: left;
+  padding: 0.625rem 0.875rem;
+  color: var(--color-foreground);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.8125rem;
+}
+
+.docs-prose table td {
+  padding: 0.5625rem 0.875rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  color: color-mix(in srgb, var(--color-foreground) 80%, transparent);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.docs-prose table tr:last-child td {
+  border-bottom: none;
+}
+
+.docs-prose table tr:hover td {
+  background-color: var(--color-surface-alt);
+}
+
+.docs-prose hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 2rem 0;
+}
+
+@media (max-width: 767px) {
+  .docs-prose {
+    font-size: 0.875rem;
+  }
+
+  .docs-prose h1 {
+    font-size: 1.625rem;
+  }
+
+  .docs-prose h2 {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+  }
+
+  .docs-prose h3 {
+    font-size: 1rem;
+  }
+
+  .docs-prose > p:first-of-type {
+    font-size: 1rem;
+  }
+
+  .docs-prose pre {
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .docs-prose pre code {
+    font-size: 0.75rem;
+  }
+
+  .docs-prose table th,
+  .docs-prose table td {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+}

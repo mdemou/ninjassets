@@ -1,0 +1,47 @@
+name: ninjasset-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ninjasset-dev-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-ninjasset_dev}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ninjasset-dev-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-server:
+    image: redis:7.4.0-alpine
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=your_secure_password
+    command:
+      [
+        "redis-server",
+        "--requirepass",
+        "your_secure_password",
+        "--appendonly",
+        "yes",
+      ]
+    volumes:
+      - ninjasset-dev-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "your_secure_password", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  ninjasset-dev-pgdata:
+  ninjasset-dev-redis-data:

@@ -1,0 +1,72 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Dev: Backend",
+      "type": "node-terminal",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "command": "npm run dev"
+    },
+    {
+      "name": "Dev: Frontend",
+      "type": "node-terminal",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "command": "npm run dev"
+    },
+    {
+      "name": "Launch Full Stack (dev.sh)",
+      "type": "node-terminal",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "command": "./dev.sh"
+    },
+    {
+      "name": "Debug Backend",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "runtimeExecutable": "${workspaceFolder}/backend/node_modules/.bin/nodemon",
+      "runtimeArgs": [
+        "--watch",
+        "src",
+        "--ext",
+        "ts,js,cjs,mjs,json",
+        "--exec",
+        "node",
+        "-r",
+        "dotenv/config",
+        "-r",
+        "tsx/cjs",
+        "-r",
+        "tsconfig-paths/register",
+        "src/main.ts"
+      ],
+      "env": {
+        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env"
+      },
+      "console": "integratedTerminal",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Frontend",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "runtimeExecutable": "${workspaceFolder}/frontend/node_modules/.bin/react-router",
+      "runtimeArgs": ["dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Launch Full Stack (separate terminals)",
+      "configurations": ["Dev: Backend", "Dev: Frontend"],
+      "preLaunchTask": "dev:preflight",
+      "stopAll": true
+    }
+  ]
+}

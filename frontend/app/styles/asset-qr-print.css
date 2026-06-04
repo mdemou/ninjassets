@@ -1,0 +1,100 @@
+.qr-print-page {
+  --qr-print-gap: 2mm;
+}
+
+.qr-print-sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--label-width));
+  gap: var(--qr-print-gap);
+  justify-content: start;
+  max-width: var(--sheet-max-width);
+}
+
+.qr-print-label {
+  width: var(--label-width);
+  min-height: var(--label-height);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1mm;
+  border: 1px dashed transparent;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.qr-print-label__qr {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: calc(var(--label-width) - 2mm);
+}
+
+.qr-print-label__name {
+  width: 100%;
+  margin-top: 1mm;
+  font-size: 7pt;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+.qr-print-label__meta {
+  width: 100%;
+  margin-top: 0.5mm;
+  font-size: 6pt;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-muted, #666);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media print {
+  body:has(.qr-print-page) > nav,
+  body:has(.qr-print-page) > div > aside {
+    display: none !important;
+  }
+
+  body:has(.qr-print-page) > div {
+    display: block !important;
+  }
+
+  body:has(.qr-print-page) main {
+    overflow: visible !important;
+  }
+
+  .qr-print-toolbar {
+    display: none !important;
+  }
+
+  .qr-print-page {
+    padding: 0 !important;
+  }
+
+  .qr-print-label {
+    border-color: transparent;
+  }
+
+  @page {
+    margin: 10mm;
+  }
+
+  @page a4 {
+    size: A4;
+  }
+
+  @page letter {
+    size: letter;
+  }
+}

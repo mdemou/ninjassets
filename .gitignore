@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+dist/
+.env
+*.log
+e2e/playwright-report/
+e2e/test-results/
+python/venv/
+python/app/**/__pycache__
+frontend/build
+frontend/.react-router
+backend/uploads/
+uploads/

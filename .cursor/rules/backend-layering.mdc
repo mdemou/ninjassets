@@ -1,0 +1,7 @@
+---
+description: Backend architecture conventions for controllers, domains, and repositories
+globs: backend/src/**/*.ts
+alwaysApply: false
+---
+
+**Read `backend/docs/backend-layering.md` before doing anything — it contains all patterns, conventions, and examples for this rule.**
