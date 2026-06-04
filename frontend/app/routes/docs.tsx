@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
 import { DocsSidebar } from '~/components/docs/DocsSidebar';
+import { GithubRepoLink } from '~/components/public-landing/GithubRepoLink';
 import { Wordmark } from '~/components/public-landing/Wordmark';
 import { pageTitleMeta } from '~/utils/pageTitle';
 import { docsSections } from '~/data/docs-pages';
@@ -100,6 +101,7 @@ export default function DocsLayout() {
             >
               API Reference
             </Link>
+            <GithubRepoLink />
           </nav>
         </div>
       </header>
@@ -198,6 +200,13 @@ export default function DocsLayout() {
           </div>
         </main>
       </div>
+
+      <footer className="border-t border-border/60 bg-card">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
+          <Wordmark />
+          <GithubRepoLink />
+        </div>
+      </footer>
     </div>
   );
 }

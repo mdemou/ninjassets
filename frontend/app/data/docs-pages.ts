@@ -11,6 +11,9 @@ export interface DocSection {
   pages: { id: string; label: string }[];
 }
 
+/** Public GitHub repository (header/footer links on landing and docs). */
+export const GITHUB_REPO_URL = 'https://github.com/mdemou/ninjassets';
+
 export const docsSections: DocSection[] = [
   {
     id: 'getting-started',
@@ -134,7 +137,7 @@ NinjAsset requires **Node.js 20+**, **PostgreSQL 16**, and **Redis 7**. The fast
 ### 1. Clone the repository
 
 \`\`\`bash
-git clone https://github.com/your-org/ninjasset.git
+git clone https://github.com/mdemou/ninjassets.git
 cd ninjasset
 \`\`\`
 

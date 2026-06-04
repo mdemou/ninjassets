@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { FeatureShowcases } from '~/components/public-landing/FeatureShowcases';
+import { GithubRepoLink } from '~/components/public-landing/GithubRepoLink';
 import { landingIconProps } from '~/components/public-landing/icons';
 import { LanguageToggle } from '~/components/public-landing/LanguageToggle';
 import { ProductPreview } from '~/components/public-landing/ProductPreview';
@@ -217,7 +218,10 @@ export default function PublicHome() {
               Docs
             </Link>
           </nav>
-          <LanguageToggle />
+          <div className="flex items-center gap-3">
+            <GithubRepoLink />
+            <LanguageToggle />
+          </div>
         </div>
       </header>
 
@@ -365,6 +369,7 @@ export default function PublicHome() {
             >
               API
             </Link>
+            <GithubRepoLink />
           </div>
           <span className="text-sm text-muted">
             © {year} Ninjasset. {t('landing.footer.rights')}
