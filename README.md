@@ -41,6 +41,7 @@ To refresh these images after UI changes, start the app on port 3000 and run `cd
 - [Tech stack](#tech-stack)
 - [Prerequisites](#prerequisites)
 - [Quick start](#quick-start)
+- [Docker Compose](#docker-compose)
 - [Development](#development)
 - [Testing](#testing)
 - [Documentation](#documentation)
@@ -111,14 +112,16 @@ Admin routes use `/api/p/*`; personal routes use `/api/me/*` (see [platform acce
 
 ## Quick start
 
+Local development with hot reload (API and web app run on the host; only PostgreSQL and Redis run in Docker).
+
 1. Copy environment defaults and start infrastructure:
 
 ```bash
 cp .env.example .env
-docker compose up -d
+docker compose up -d postgres redis-server
 ```
 
-This starts **PostgreSQL** and **Redis** only. Redis backs webhooks, email jobs, the periodic maintenance scheduler, and optional import/export job wakeups.
+Redis backs webhooks, email jobs, the periodic maintenance scheduler, and optional import/export job wakeups.
 
 2. Run the API (from a new terminal):
 
@@ -142,6 +145,49 @@ npm run dev
 App: **[http://localhost:3000](http://localhost:3000)**
 
 Optional seed data: `cd backend && npm run seed` (append-only). For a full reset plus richer demo data: `npm run seed:demo`.
+
+## Docker Compose
+
+Run the full stack from published images (PostgreSQL, Redis, backend API, and nginx frontend). The backend container loads **`.env` from the repository root** (same file as local development).
+
+1. Create `.env` if you have not already:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` before starting. At minimum, set strong values for `JWT_ADMIN_SECRET_KEY` and `JWT_USER_SECRET_KEY`. Keep `REDIS_PASSWORD` in sync with the password configured for the `redis-server` service in `docker-compose.yml` (default `your_secure_password`).
+
+Compose overrides a few variables for container networking — you do **not** need to change these in `.env` manually:
+
+| Variable | Value inside Compose |
+| --- | --- |
+| `DB_HOST` | `postgres` |
+| `REDIS_HOST` | `redis-server` |
+| `DATABASE_URL` | `postgres://<DB_USER>:<DB_PASSWORD>@postgres:5432/<DB_NAME>` |
+
+2. Pull images and start all services:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+- **App:** [http://localhost:3000](http://localhost:3000) — nginx serves the SPA and proxies `/api/` to the backend
+- **API (direct):** [http://localhost:3001](http://localhost:3001)
+
+The backend image runs Knex migrations on startup. Mount a volume on `/app/uploads` in the `backend` service so avatars, asset images, and import files survive restarts.
+
+3. After a new release (version tag on GitHub), refresh images:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Images are published to GitHub Container Registry on version tags (`v*`). If the packages are private, log in first: `docker login ghcr.io`.
+
+To run only infrastructure while developing on the host, use [Quick start](#quick-start) (`docker compose up -d postgres redis-server`).
 
 ## Development
 

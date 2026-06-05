@@ -65,8 +65,12 @@ services:
   frontend:
     image: ghcr.io/mdemou/ninjasset-frontend:latest
     container_name: ninjasset-dev-frontend
+    env_file:
+      - .env
+    environment:
+      PORT: 3000
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
       - backend
     restart: unless-stopped
