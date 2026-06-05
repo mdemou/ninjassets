@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router';
+import { Button } from '~/components/Button';
 import { FeatureShowcases } from '~/components/public-landing/FeatureShowcases';
 import { GithubRepoLink } from '~/components/public-landing/GithubRepoLink';
 import { landingIconProps } from '~/components/public-landing/icons';
@@ -8,6 +10,7 @@ import { ProductPreview } from '~/components/public-landing/ProductPreview';
 import { PublicBackground } from '~/components/public-landing/PublicBackground';
 import { Wordmark } from '~/components/public-landing/Wordmark';
 import { useLanguage } from '~/providers/LanguageProvider';
+import { usePublicConfig } from '~/providers/PublicConfigProvider';
 import { pageTitleMeta } from '~/utils/pageTitle';
 import type { TranslationKey } from '~/utils/translations';
 
@@ -190,7 +193,12 @@ const highlights: TranslationKey[] = [
 
 export default function PublicHome() {
   const { t } = useLanguage();
+  const { signupEnabled, loadPublicConfig } = usePublicConfig();
   const year = new Date().getFullYear();
+
+  useEffect(() => {
+    loadPublicConfig();
+  }, [loadPublicConfig]);
 
   return (
     <div className="relative min-h-full bg-card text-foreground">
@@ -221,6 +229,25 @@ export default function PublicHome() {
           <div className="flex items-center gap-3">
             <GithubRepoLink />
             <LanguageToggle />
+            <Link
+              to="/login"
+              className="hidden text-[0.9375rem] text-muted no-underline transition-colors hover:text-foreground hover:no-underline sm:inline"
+            >
+              {t('landing.nav.login')}
+            </Link>
+            {signupEnabled && (
+              <Link
+                to="/register"
+                className="no-underline hover:no-underline"
+              >
+                <Button
+                  variant="primary"
+                  className="px-4 py-1.5 shadow-[0_4px_14px_rgb(16_148_97/0.35)]"
+                >
+                  {t('landing.nav.signup')}
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -245,7 +272,44 @@ export default function PublicHome() {
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted lg:mx-0">
               {t('landing.hero.subtitle')}
             </p>
-            <p className="mt-9 text-sm text-muted">{t('landing.hero.note')}</p>
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+              {signupEnabled && (
+                <Link
+                  to="/register"
+                  className="no-underline hover:no-underline"
+                >
+                  <Button
+                    variant="primary"
+                    className="px-7 py-2.5 text-base shadow-[0_8px_24px_rgb(16_148_97/0.3)] transition-transform hover:scale-[1.02]"
+                  >
+                    {t('landing.hero.ctaPrimary')}
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      aria-hidden
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </Button>
+                </Link>
+              )}
+              <Link
+                to="/login"
+                className="no-underline hover:no-underline"
+              >
+                <Button
+                  variant="tertiary"
+                  className="px-7 py-2.5 text-base backdrop-blur-sm"
+                >
+                  {t('landing.hero.ctaSecondary')}
+                </Button>
+              </Link>
+            </div>
+            <p className="mt-6 text-sm text-muted">{t('landing.hero.note')}</p>
           </div>
           <ProductPreview />
         </div>
@@ -347,6 +411,38 @@ export default function PublicHome() {
         <div className="relative mx-auto max-w-3xl px-6 py-24 text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{t('landing.cta.title')}</h2>
           <p className="mt-4 text-lg text-white/70">{t('landing.cta.subtitle')}</p>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            {signupEnabled && (
+              <Link
+                to="/register"
+                className="no-underline hover:no-underline"
+              >
+                <Button
+                  variant="primary"
+                  className="px-8 py-3 text-base shadow-[0_8px_24px_rgb(16_148_97/0.35)]"
+                >
+                  {t('landing.cta.button')}
+                </Button>
+              </Link>
+            )}
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-1 text-[0.9375rem] text-white/80 no-underline transition-colors hover:text-white hover:no-underline"
+            >
+              {t('landing.cta.login')}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -369,6 +465,20 @@ export default function PublicHome() {
             >
               API
             </Link>
+            <Link
+              to="/login"
+              className="no-underline transition-colors hover:text-foreground hover:no-underline"
+            >
+              {t('landing.nav.login')}
+            </Link>
+            {signupEnabled && (
+              <Link
+                to="/register"
+                className="font-medium text-primary no-underline hover:no-underline"
+              >
+                {t('landing.nav.signup')}
+              </Link>
+            )}
             <GithubRepoLink />
           </div>
           <span className="text-sm text-muted">

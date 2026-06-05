@@ -1,3 +1,6 @@
+[![Release](https://github.com/mdemou/ninjassets/actions/workflows/release.yml/badge.svg)](https://github.com/mdemou/ninjassets/actions/workflows/release.yml)
+[![CI](https://github.com/mdemou/ninjassets/actions/workflows/ci.yml/badge.svg)](https://github.com/mdemou/ninjassets/actions/workflows/ci.yml)
+
 <img src="frontend/public/ninjasset.png" alt="Ninjasset logo" width="128" />
 
 # NinjAsset

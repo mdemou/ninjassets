@@ -100,8 +100,8 @@ The frontend and backend are separate Node.js packages. Both can run with \`npm 
 
 | URL | Purpose |
 |---|---|
-| \`/\` | Public marketing landing (features, docs links; no sign-in buttons) |
-| \`/docs\` | This documentation |
+| \`/\` | Public marketing landing (features, docs links, **Get started** / **Log in** CTAs) |
+| \`/docs\` | This documentation (header includes **Sign in** → \`/login\`) |
 | \`/login\` | Email/password sign-in; register link when signup is enabled |
 | \`/register\` | Self-service registration (when \`SIGNUP_ENABLED\` is not \`false\`) |
 
@@ -191,7 +191,7 @@ npm install
 npm run dev          # starts on :3000
 \`\`\`
 
-Open [http://localhost:3000/login](http://localhost:3000/login) and sign in with the seeded admin credentials printed by \`npm run seed\`. The root URL (\`/\`) is the public marketing landing and does not include a sign-in form.
+Open [http://localhost:3000](http://localhost:3000) and use **Log in** or **Get started** on the landing page, or go directly to [http://localhost:3000/login](http://localhost:3000/login). Sign in with the seeded admin credentials printed by \`npm run seed\`.
 
 ## Environment variables reference
 
@@ -854,7 +854,7 @@ Browser sessions authenticate with **JWT access tokens** obtained from the login
 
 ### Public config (signup gate)
 
-The SPA loads runtime auth flags when the user opens \`/login\` or \`/register\`:
+The SPA loads runtime auth flags when the user opens \`/\`, \`/login\`, or \`/register\` (to show or hide signup CTAs):
 
 \`\`\`http
 GET /api/session/public-config
@@ -866,7 +866,7 @@ GET /api/session/public-config
 }
 \`\`\`
 
-When \`signupEnabled\` is \`false\` (set \`SIGNUP_ENABLED=false\` on the server), the register page redirects to login and the login page hides the sign-up link. The public landing at \`/\` does not call this endpoint.
+When \`signupEnabled\` is \`false\` (set \`SIGNUP_ENABLED=false\` on the server), the register page redirects to login, the login page hides the sign-up link, and the landing page hides **Get started** / sign-up links.
 
 ### Login
 
