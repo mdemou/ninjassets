@@ -38,6 +38,7 @@ Central registry of feature specifications. Each spec follows the numbered outli
 | SPEC-IMPORT-001 | [spec-import-export.md](spec-import-export.md) | Implemented (MVP+P2) | REQ-IMPORT-001 / REQ-IMPORT-002 | platform, API, asset, site, catalog, user, handover | Bulk import/export hub, async jobs, CSV/XLSX/JSON |
 | SPEC-WEBHOOK-001 | [spec-webhooks-notifications.md](spec-webhooks-notifications.md) | Implemented | REQ-WEBHOOK-001 | platform, asset, handover, alerts, user, import-export | Central domain event catalog + event bus; admin-managed Slack/Discord/Telegram webhook destinations with per-destination event subscriptions |
 | SPEC-BRANDING-001 | [spec-app-branding.md](spec-app-branding.md) | Draft | REQ-BRANDING-001 (TBD) | platform, public-landing, email, custody-receipt | Admin-configurable logo, app name, tagline, and primary/secondary colors across UI, emails, PDFs, and QR codes |
+| SPEC-AI-ASSISTANT-001 | [spec-ai-assistant.md](spec-ai-assistant.md) | Draft | REQ-AI-ASSISTANT-001 (TBD) | platform, i18n, api-automation | Admin-only RAG chatbot; backend proxy to aiagent; EN/ES; v2 agent actions |
 
 ## E2E folder → spec map
 
@@ -62,7 +63,8 @@ Central registry of feature specifications. Each spec follows the numbered outli
 | `import-export/` | spec-import-export.md |
 | `webhooks/` | spec-webhooks-notifications.md |
 | `branding/` (planned) | spec-app-branding.md |
+| `ai-assistant/` (planned) | spec-ai-assistant.md |
 
 ---
 
-*Last updated: 2026-06-04*
+*Last updated: 2026-06-07*
