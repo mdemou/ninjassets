@@ -144,10 +144,12 @@ cd ninjasset
 ### 2. Set up environment variables
 
 \`\`\`bash
-cp .env.example .env
+cp backend/.env.example backend/.env
+# optional — defaults work for local dev
+cp frontend/.env.example frontend/.env
 \`\`\`
 
-Open \`.env\` and set at minimum:
+Open \`backend/.env\` and set at minimum:
 
 \`\`\`dotenv
 DATABASE_URL=postgres://ninjasset:ninjasset@localhost:5432/ninjasset
@@ -160,7 +162,7 @@ FRONTEND_URL=http://localhost:3000
 ### 3. Start infrastructure
 
 \`\`\`bash
-docker compose up -d
+docker compose --env-file backend/.env up -d
 \`\`\`
 
 This starts **PostgreSQL** and **Redis** only. The app runs outside Docker during development.
@@ -195,13 +197,13 @@ Open [http://localhost:3000](http://localhost:3000) and use **Log in** or **Get 
 
 ## Environment variables reference
 
-Copy \`.env.example\` to \`.env\` at the repository root. Values below are **application defaults** from \`backend/src/config/config.ts\` when a variable is unset. \`DATABASE_URL\` is used by Knex migrations and Docker Compose but is not read by the runtime config object (the app uses \`DB_*\` fields).
+Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **application defaults** from \`backend/src/config/config.ts\` when a variable is unset. \`DATABASE_URL\` is used by Knex migrations and Docker Compose but is not read by the runtime config object (the app uses \`DB_*\` fields). E2E tests use a separate \`e2e/.env\` (PostgreSQL + Redis only); the frontend dev server optionally uses \`frontend/.env\` (\`PORT\`, \`API_URL\`).
 
 ### Database
 
 | Variable | Purpose | Default |
 |---|---|---|
-| \`DATABASE_URL\` | PostgreSQL URL for Knex migrations / Compose (not used by runtime \`config.db\`) | — (see \`.env.example\`) |
+| \`DATABASE_URL\` | PostgreSQL URL for Knex migrations / Compose (not used by runtime \`config.db\`) | — (see \`backend/.env.example\`) |
 | \`DB_USER\` | PostgreSQL user | \`postgres\` |
 | \`DB_PASSWORD\` | PostgreSQL password | \`postgres\` |
 | \`DB_HOST\` | PostgreSQL host | \`localhost\` |
@@ -375,7 +377,7 @@ services:
 
   backend:
     image: ninjasset-backend:latest
-    env_file: .env
+    env_file: backend/.env
     depends_on: [db, redis]
     ports:
       - "3001:3001"
@@ -383,7 +385,6 @@ services:
 
   frontend:
     image: ninjasset-frontend:latest
-    env_file: .env
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -446,7 +447,7 @@ server {
 ## Security checklist
 
 - Set strong random values for \`JWT_ADMIN_SECRET_KEY\` and \`JWT_USER_SECRET_KEY\` (32+ chars).
-- Never commit \`.env\` to version control.
+- Never commit \`backend/.env\`, \`e2e/.env\`, or \`frontend/.env\` to version control.
 - Use a dedicated PostgreSQL user with access only to the \`ninjasset\` database.
 - Enable TLS on your reverse proxy.
 - Consider setting \`SIGNUP_ENABLED=false\` after initial user creation.

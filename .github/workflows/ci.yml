@@ -54,16 +54,17 @@ jobs:
             frontend/package-lock.json
             e2e/package-lock.json
 
-      # CI .env: a password-less Redis service and the mocked email/captcha
-      # backend. The Playwright webServer also forces MOCK_EMAIL/MOCK_CAPTCHA
-      # for the test backend, so Mailtrap/SMTP is bypassed regardless.
-      - name: Create .env
+      # CI env files: password-less Redis and mocked email/captcha on the backend.
+      # Playwright webServer also forces MOCK_EMAIL/MOCK_CAPTCHA for the test backend.
+      - name: Create env files
         run: |
-          cp .env.example .env
-          sed -i 's/^REDIS_PASSWORD=.*/REDIS_PASSWORD=/' .env
-          sed -i 's/^MOCK_EMAIL=.*/MOCK_EMAIL=true/' .env
-          sed -i 's/^MOCK_CAPTCHA=.*/MOCK_CAPTCHA=true/' .env
-          sed -i 's#^SMTP_HOST=.*#SMTP_HOST=#' .env
+          cp backend/.env.example backend/.env
+          cp e2e/.env.example e2e/.env
+          sed -i 's/^REDIS_PASSWORD=.*/REDIS_PASSWORD=/' backend/.env
+          sed -i 's/^REDIS_PASSWORD=.*/REDIS_PASSWORD=/' e2e/.env
+          sed -i 's/^MOCK_EMAIL=.*/MOCK_EMAIL=true/' backend/.env
+          sed -i 's/^MOCK_CAPTCHA=.*/MOCK_CAPTCHA=true/' backend/.env
+          sed -i 's#^SMTP_HOST=.*#SMTP_HOST=#' backend/.env
 
       - name: Install backend dependencies
         working-directory: backend

@@ -31,11 +31,12 @@ The test servers use ports `4000` and `4001`, leaving the normal development por
 
 - Docker Compose services must be running with PostgreSQL reachable on `DB_HOST` / `DB_PORT`.
 - `backend/` and `frontend/` dependencies must be installed.
-- The root `.env` file must exist. Copy `.env.example` if needed.
+- `e2e/.env` must exist. Copy `e2e/.env.example` if needed (PostgreSQL + Redis connection only).
 
 ## Setup
 
 ```bash
+cp e2e/.env.example e2e/.env   # if missing — match your local Postgres/Redis
 cd e2e
 npm install
 npm run install:browsers

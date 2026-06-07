@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 function numericMigrationSort(a, b) {
   const numA = BigInt(a.split('_')[0]);

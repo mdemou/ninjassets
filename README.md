@@ -117,8 +117,8 @@ Local development with hot reload (API and web app run on the host; only Postgre
 1. Copy environment defaults and start infrastructure:
 
 ```bash
-cp .env.example .env
-docker compose up -d postgres redis-server
+cp backend/.env.example backend/.env
+docker compose --env-file backend/.env up -d postgres redis-server
 ```
 
 Redis backs webhooks, email jobs, the periodic maintenance scheduler, and optional import/export job wakeups.
@@ -148,17 +148,17 @@ Optional seed data: `cd backend && npm run seed` (append-only). For a full reset
 
 ## Docker Compose
 
-Run the full stack from published images (PostgreSQL, Redis, backend API, and nginx frontend). The backend container loads **`.env` from the repository root** (same file as local development).
+Run the full stack from published images (PostgreSQL, Redis, backend API, and nginx frontend). The backend container loads **`backend/.env`** (same file as local development).
 
-1. Create `.env` if you have not already:
+1. Create `backend/.env` if you have not already:
 
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
 
-Edit `.env` before starting. At minimum, set strong values for `JWT_ADMIN_SECRET_KEY` and `JWT_USER_SECRET_KEY`. Keep `REDIS_PASSWORD` in sync with the password configured for the `redis-server` service in `docker-compose.yml` (default `your_secure_password`).
+Edit `backend/.env` before starting. At minimum, set strong values for `JWT_ADMIN_SECRET_KEY` and `JWT_USER_SECRET_KEY`. Keep `REDIS_PASSWORD` in sync with the password configured for the `redis-server` service in `docker-compose.yml` (default `your_secure_password`).
 
-Compose overrides a few variables for container networking — you do **not** need to change these in `.env` manually:
+Compose overrides a few variables for container networking — you do **not** need to change these in `backend/.env` manually:
 
 | Variable | Value inside Compose |
 | --- | --- |
@@ -169,8 +169,8 @@ Compose overrides a few variables for container networking — you do **not** ne
 2. Pull images and start all services:
 
 ```bash
-docker compose pull
-docker compose up -d
+docker compose --env-file backend/.env pull
+docker compose --env-file backend/.env up -d
 ```
 
 - **App:** [http://localhost:3000](http://localhost:3000) — nginx serves the SPA and proxies `/api/` to the backend
@@ -181,17 +181,23 @@ The backend image runs Knex migrations on startup. Mount a volume on `/app/uploa
 3. After a new release (version tag on GitHub), refresh images:
 
 ```bash
-docker compose pull
-docker compose up -d
+docker compose --env-file backend/.env pull
+docker compose --env-file backend/.env up -d
 ```
 
 Images are published to GitHub Container Registry on version tags (`v*`). If the packages are private, log in first: `docker login ghcr.io`.
 
-To run only infrastructure while developing on the host, use [Quick start](#quick-start) (`docker compose up -d postgres redis-server`).
+To run only infrastructure while developing on the host, use [Quick start](#quick-start) (`docker compose --env-file backend/.env up -d postgres redis-server`).
 
 ## Development
 
-Environment variables live in **`.env` at the repository root** (next to `docker-compose.yml`). Knex migrations load the same file from `backend/`.
+Environment variables are split per service:
+
+| File | Purpose |
+| --- | --- |
+| `backend/.env` | API, Knex migrations, Docker Compose (`--env-file backend/.env`) |
+| `e2e/.env` | Playwright tests (PostgreSQL + Redis connection only) |
+| `frontend/.env` | Optional dev-server overrides (`PORT`, `API_URL`) |
 
 | Variable                                                                                                   | Purpose                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |

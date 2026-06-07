@@ -18,7 +18,7 @@ Scripts:
 - `npm run test:headed` runs with a visible browser.
 - `npm run test:report` serves the latest HTML report.
 
-Connection defaults follow the root `.env` and the same `DB_*` variables used by the backend. See `docs/e2e-testing.md` for architecture and a deeper walk-through.
+Connection defaults come from `e2e/.env` (`DB_*` and `REDIS_*`, matching your local Postgres/Redis). See `docs/e2e-testing.md` for architecture and a deeper walk-through.
 
 ## Test layout
 

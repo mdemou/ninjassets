@@ -5,7 +5,7 @@ import path from "path";
 import { Client } from "pg";
 import { TEST_DB_NAME, TEST_REDIS_DB } from "../config";
 
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const quiet = !!process.env.E2E_AGENT;
 

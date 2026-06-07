@@ -5,8 +5,8 @@ Thank you for your interest in contributing. Ninjasset is MIT-licensed; by submi
 ## Before you start
 
 1. **Search existing issues and pull requests** — Avoid duplicate work; discuss large changes in an issue first if you are unsure about direction.
-2. **Set up locally** — Follow [README.md](README.md#quick-start) (Docker for PostgreSQL/Redis, backend on `:3001`, frontend on `:3000`, root `.env` from `.env.example`).
-3. **Never commit secrets** — Do not add `.env`, API keys, passwords, or real customer data. Use placeholders in `.env.example` only.
+2. **Set up locally** — Follow [README.md](README.md#quick-start) (Docker for PostgreSQL/Redis, backend on `:3001`, frontend on `:3000`, `backend/.env` from `backend/.env.example`).
+3. **Never commit secrets** — Do not add `.env` files, API keys, passwords, or real customer data. Use placeholders in `*.env.example` only.
 
 ## How we work
 

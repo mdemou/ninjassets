@@ -82,12 +82,12 @@ start_service() {
 # ---- 0. preflight ----------------------------------------------------------
 info "Repo root: $ROOT"
 
-if [ ! -f "$ROOT/.env" ]; then
-  if [ -f "$ROOT/.env.example" ]; then
-    cp "$ROOT/.env.example" "$ROOT/.env"
-    warn "Root .env was missing — created it from .env.example. Review its values."
+if [ ! -f "$ROOT/backend/.env" ]; then
+  if [ -f "$ROOT/backend/.env.example" ]; then
+    cp "$ROOT/backend/.env.example" "$ROOT/backend/.env"
+    warn "backend/.env was missing — created it from backend/.env.example. Review its values."
   else
-    err "No root .env and no .env.example — backend/infra config will be incomplete."
+    err "No backend/.env and no backend/.env.example — backend/infra config will be incomplete."
   fi
 fi
 
@@ -95,7 +95,7 @@ fi
 if have docker && docker info >/dev/null 2>&1; then
   info "Ensuring docker infra is up (postgres)…"
   # `up -d` is itself idempotent: already-running containers are left as-is.
-  if docker compose -f "$ROOT/docker-compose.yml" --env-file "$ROOT/.env" \
+  if docker compose -f "$ROOT/docker-compose.yml" --env-file "$ROOT/backend/.env" \
        up -d postgres >>"$LOG_DIR/docker.log" 2>&1; then
     ok "Docker infra ready."
   else
@@ -143,7 +143,7 @@ else
 fi
 
 # ---- 3. start host services ------------------------------------------------
-# Backend API (loads root .env via DOTENV_CONFIG_PATH in its npm script).
+# Backend API (loads backend/.env via dotenv in its npm script).
 if have npm; then
   start_service "backend" 3001 "$LOG_DIR/backend.log" "$ROOT/backend" \
     npm run dev

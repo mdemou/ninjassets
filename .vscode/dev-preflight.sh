@@ -11,19 +11,19 @@ warn() { printf '[dev-preflight] WARN: %s\n' "$*"; }
 err()  { printf '[dev-preflight] ERROR: %s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
 
-if [ ! -f "$ROOT/.env" ]; then
-  if [ -f "$ROOT/.env.example" ]; then
-    cp "$ROOT/.env.example" "$ROOT/.env"
-    warn "Created .env from .env.example — review its values."
+if [ ! -f "$ROOT/backend/.env" ]; then
+  if [ -f "$ROOT/backend/.env.example" ]; then
+    cp "$ROOT/backend/.env.example" "$ROOT/backend/.env"
+    warn "Created backend/.env from backend/.env.example — review its values."
   else
-    err "No root .env and no .env.example."
+    err "No backend/.env and no backend/.env.example."
     exit 1
   fi
 fi
 
 if have docker && docker info >/dev/null 2>&1; then
   info "Starting docker infra (postgres)…"
-  if ! docker compose -f "$ROOT/docker-compose.yml" --env-file "$ROOT/.env" \
+  if ! docker compose -f "$ROOT/docker-compose.yml" --env-file "$ROOT/backend/.env" \
        up -d postgres >>"$LOG_DIR/docker.log" 2>&1; then
     err "docker compose failed — see .dev/logs/docker.log"
     exit 1

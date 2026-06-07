@@ -8,7 +8,7 @@ import {
   TEST_REDIS_DB,
 } from "./config";
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const dbUser = process.env.DB_USER || "postgres";
 const dbPassword = process.env.DB_PASSWORD || "postgres";

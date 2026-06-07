@@ -44,7 +44,7 @@
         "src/main.ts"
       ],
       "env": {
-        "DOTENV_CONFIG_PATH": "${workspaceFolder}/.env"
+        "DOTENV_CONFIG_PATH": "${workspaceFolder}/backend/.env"
       },
       "console": "integratedTerminal",
       "restart": true,

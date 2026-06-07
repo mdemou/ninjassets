@@ -43,7 +43,7 @@ Registered at boot in `init.ts`:
 | `import-export-sweep` | 30 s (`IMPORT_SAFETY_SWEEP_MS`) | `IMPORT_EXPORT_ENABLED` | Drain import/export jobs missed while Redis was down |
 | `import-artifact-purge` | 6 h | always | Delete import/export files past `IMPORT_ARTIFACT_RETENTION_DAYS` |
 
-Configuration (root `.env`): `MAINTENANCE_TICK_MS`, `MAINTENANCE_LOCK_TTL_SEC`, `MAINTENANCE_KEY_PREFIX`, `TOKEN_CLEANUP_INTERVAL_MS`, `API_RETENTION_PURGE_INTERVAL_MS`, `IMPORT_ARTIFACT_PURGE_INTERVAL_MS`, plus feature-specific intervals above.
+Configuration (`backend/.env`): `MAINTENANCE_TICK_MS`, `MAINTENANCE_LOCK_TTL_SEC`, `MAINTENANCE_KEY_PREFIX`, `TOKEN_CLEANUP_INTERVAL_MS`, `API_RETENTION_PURGE_INTERVAL_MS`, `IMPORT_ARTIFACT_PURGE_INTERVAL_MS`, plus feature-specific intervals above.
 
 **Note:** Data-quality **rules** for the UI and reports are computed on read ([spec-data-quality-and-alerts.md](spec-data-quality-and-alerts.md)); only the webhook **scan** runs on this schedule.
 

@@ -12,7 +12,7 @@ import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
-dotenv.config({ path: path.join(ROOT, '.env') });
+dotenv.config({ path: path.join(ROOT, 'backend', '.env') });
 
 const OUT_DIR = path.join(ROOT, 'docs', 'screenshots');
 const BASE_URL = process.env.README_SCREENSHOT_BASE_URL || 'http://localhost:3000';

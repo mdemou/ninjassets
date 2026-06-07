@@ -46,7 +46,7 @@ services:
     image: ghcr.io/mdemou/ninjasset-backend:latest
     container_name: ninjasset-dev-backend
     env_file:
-      - .env
+      - backend/.env
     environment:
       DB_HOST: postgres
       REDIS_HOST: redis-server
