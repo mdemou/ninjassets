@@ -101,7 +101,16 @@ docker compose -f docker-compose.yml up
 
 The backend image runs migrations on startup. Add `-d` to run detached.
 
-3. If you enabled the AI assistant, populate Qdrant from this repo checkout (once, or after editing specs/docs/API):
+3. **First admin user** — Migrations create roles only, not users. Ensure `SIGNUP_ENABLED=true` in `backend/.env`, register at `/register`, then promote the account in PostgreSQL:
+
+```sql
+UPDATE "user"
+SET status = 'ACTIVE',
+    role_id = (SELECT id FROM role WHERE name = 'ADMIN')
+WHERE email = 'you@example.com';
+```
+
+4. If you enabled the AI assistant, populate Qdrant from this repo checkout (once, or after editing specs/docs/API):
 
 ```bash
 cd aiagent
