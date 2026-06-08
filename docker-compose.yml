@@ -54,19 +54,42 @@ services:
     environment:
       QDRANT__SERVICE__GRPC_PORT: 6334
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:6333/readyz",
-        ]
+      # The qdrant image ships no wget/curl, so use a bash TCP probe on the REST port.
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/localhost/6333"]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 5s
+
+  aiagent:
+    image: ghcr.io/mdemou/ninjasset-aiagent:latest
+    container_name: ninjasset-dev-aiagent
+    env_file:
+      - aiagent/.env
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      HF_HOME: /models/hf
+    ports:
+      - "8000:8000"
+    volumes:
+      # Host HF cache → container HF_HOME (set HF_CACHE_DIR in .env to override).
+      - ${HF_CACHE_DIR:-${HOME}/.cache/huggingface}:/models/hf
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 300s
+    restart: unless-stopped
 
   backend:
     image: ghcr.io/mdemou/ninjasset-backend:latest
@@ -77,6 +100,7 @@ services:
       DB_HOST: postgres
       REDIS_HOST: redis-server
       DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-ninjasset_dev}
+      AI_AGENT_URL: http://aiagent:8000
     ports:
       - "${PORT:-3001}:3001"
     volumes:
@@ -85,6 +109,8 @@ services:
       postgres:
         condition: service_healthy
       redis-server:
+        condition: service_healthy
+      aiagent:
         condition: service_healthy
     restart: unless-stopped
 
@@ -100,4 +126,5 @@ services:
 volumes:
   ninjasset-dev-pgdata:
   ninjasset-dev-redis-data:
+  ninjasset-dev-qdrant-data:
   ninjasset-dev-backend-uploads:

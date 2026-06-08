@@ -1,5 +1,7 @@
 venv/
+.venv/
 .venv-test/
+uv.lock
 __pycache__/
 *.pyc
 .git/

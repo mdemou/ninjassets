@@ -108,7 +108,7 @@ Admin routes use `/api/p/*`; personal routes use `/api/me/*` (see [platform acce
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Frontend             | React 19, React Router 7 (SPA), Tailwind CSS v4, Leaflet, Recharts                                                                                                                            |
 | Backend              | Node.js, Hapi, Knex, PostgreSQL                                                                                                                                                               |
-| AI assistant         | Python FastAPI (`aiagent`), LangChain + Qdrant, optional Ollama/OpenAI-compatible LLM                                                                                                         |
+| AI assistant         | Python FastAPI (`aiagent`), LangChain + Qdrant + Grok/xAI (configurable), CPU embeddings (`multilingual-e5-base`)                                                                             |
 | Jobs & notifications | Redis queues (webhooks, email, import/export wakeups) plus a Redis-backed periodic scheduler (token cleanup, API log retention, notification reaper, webhook alert scan, import/export sweep) |
 | Tests                | Playwright (isolated stack on ports 4000/4001)                                                                                                                                                |
 
@@ -126,10 +126,10 @@ Local development with hot reload (API and web app run on the host; only Postgre
 
 ```bash
 cp backend/.env.example backend/.env
-docker compose --env-file backend/.env up -d postgres redis-server
+docker compose --env-file backend/.env up -d postgres redis-server qdrant
 ```
 
-Redis backs webhooks, email jobs, the periodic maintenance scheduler, and optional import/export job wakeups.
+Redis backs webhooks, email jobs, the periodic maintenance scheduler, and optional import/export job wakeups. Qdrant is only needed when running the AI assistant locally (see [aiagent/README.md](aiagent/README.md)).
 
 2. Run the API (from a new terminal):
 
@@ -156,23 +156,52 @@ Optional seed data: `cd backend && npm run seed` (append-only). For a full reset
 
 ## Docker Compose
 
-Run the full stack from published images (PostgreSQL, Redis, backend API, and nginx frontend). The backend container loads **`backend/.env`** (same file as local development).
+Run the full stack from published images: PostgreSQL, Redis, Qdrant, **aiagent** (AI RAG service), backend API, and nginx frontend.
 
-1. Create `backend/.env` if you have not already:
+| Service | Image | Notes |
+| --- | --- | --- |
+| `postgres`, `redis-server` | Official images | Same as local dev |
+| `qdrant` | `qdrant/qdrant` | Vector store for the assistant |
+| `aiagent` | `ghcr.io/<owner>/ninjasset-aiagent` | ~2 GB image (deps only); embedding model via volume |
+| `backend`, `frontend` | `ghcr.io/<owner>/ninjasset-{backend,frontend}` | API + SPA |
+
+1. Create env files:
 
 ```bash
 cp backend/.env.example backend/.env
+cp aiagent/.env.example aiagent/.env
 ```
 
 Edit `backend/.env` before starting. At minimum, set strong values for `JWT_ADMIN_SECRET_KEY` and `JWT_USER_SECRET_KEY`. Keep `REDIS_PASSWORD` in sync with the password configured for the `redis-server` service in `docker-compose.yml` (default `your_secure_password`).
 
-Compose overrides a few variables for container networking — you do **not** need to change these in `backend/.env` manually:
+For the AI assistant, set in `backend/.env`:
+
+- `AI_ASSISTANT_ENABLED=true`
+- `AI_AGENT_API_KEY` — shared secret (same value in `aiagent/.env`)
+
+Set in `aiagent/.env`:
+
+- `GROK_API_KEY` — LLM provider key
+- `AI_AGENT_API_KEY` — must match the backend
+
+Compose overrides container networking — you do **not** need to set these manually in `backend/.env`:
 
 | Variable | Value inside Compose |
 | --- | --- |
 | `DB_HOST` | `postgres` |
 | `REDIS_HOST` | `redis-server` |
 | `DATABASE_URL` | `postgres://<DB_USER>:<DB_PASSWORD>@postgres:5432/<DB_NAME>` |
+| `AI_AGENT_URL` | `http://aiagent:8000` |
+| `QDRANT_URL` (aiagent) | `http://qdrant:6333` |
+
+**Embedding model volume:** the aiagent image does not include the ~1.1 GB Hugging Face weights. By default, Compose bind-mounts your host cache:
+
+```env
+# optional — defaults to ~/.cache/huggingface
+HF_CACHE_DIR=/Users/you/.cache/huggingface
+```
+
+First aiagent start with an empty cache downloads the model (several minutes; healthcheck allows up to 5 minutes).
 
 2. Pull images and start all services:
 
@@ -183,8 +212,9 @@ docker compose --env-file backend/.env up -d
 
 - **App:** [http://localhost:3000](http://localhost:3000) — nginx serves the SPA and proxies `/api/` to the backend
 - **API (direct):** [http://localhost:3001](http://localhost:3001)
+- **aiagent (internal):** [http://localhost:8000](http://localhost:8000) — backend proxy only; do not expose publicly in production
 
-The backend image runs Knex migrations on startup. Mount a volume on `/app/uploads` in the `backend` service so avatars, asset images, and import files survive restarts.
+The backend image runs Knex migrations on startup. Named volumes persist PostgreSQL data, Qdrant vectors, backend uploads, and (optionally) the HF cache if you switch from a bind mount to a named volume.
 
 3. After a new release (version tag on GitHub), refresh images:
 
@@ -193,9 +223,9 @@ docker compose --env-file backend/.env pull
 docker compose --env-file backend/.env up -d
 ```
 
-Images are published to GitHub Container Registry on version tags (`v*`). If the packages are private, log in first: `docker login ghcr.io`.
+Images (`ninjasset-backend`, `ninjasset-frontend`, `ninjasset-aiagent`) are published to GitHub Container Registry on version tags (`v*`). If the packages are private, log in first: `docker login ghcr.io`.
 
-To run only infrastructure while developing on the host, use [Quick start](#quick-start) (`docker compose --env-file backend/.env up -d postgres redis-server`).
+To run only infrastructure while developing on the host, use [Quick start](#quick-start) (`docker compose --env-file backend/.env up -d postgres redis-server qdrant`).
 
 ## Development
 

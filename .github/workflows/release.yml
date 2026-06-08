@@ -110,6 +110,9 @@ jobs:
           - name: frontend
             context: frontend
             image: ninjasset-frontend
+          - name: aiagent
+            context: aiagent
+            image: ninjasset-aiagent
 
     steps:
       - name: Checkout

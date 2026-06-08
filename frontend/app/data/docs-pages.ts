@@ -162,10 +162,20 @@ FRONTEND_URL=http://localhost:3000
 ### 3. Start infrastructure
 
 \`\`\`bash
-docker compose --env-file backend/.env up -d
+docker compose --env-file backend/.env up -d postgres redis-server
 \`\`\`
 
 This starts **PostgreSQL** and **Redis** only. The app runs outside Docker during development.
+
+For the **AI assistant**, also start Qdrant and run \`aiagent\` on the host (see [aiagent/README.md](https://github.com/mdemou/ninjassets/blob/main/aiagent/README.md)):
+
+\`\`\`bash
+docker compose --env-file backend/.env up -d qdrant
+cp aiagent/.env.example aiagent/.env   # set GROK_API_KEY
+cd aiagent && uv sync && uv run uvicorn ai_service.main:app --reload
+\`\`\`
+
+Set \`AI_ASSISTANT_ENABLED=true\` in \`backend/.env\`.
 
 ### 4. Start the API
 
@@ -377,57 +387,39 @@ This guide covers running NinjAsset in a production-like environment using Docke
 
 ## Production Docker Compose
 
-A minimal \`docker-compose.yml\` for a single-server deployment:
-
-\`\`\`yaml
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: ninjasset
-      POSTGRES_USER: ninjasset
-      POSTGRES_PASSWORD: \${DB_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-
-  backend:
-    image: ninjasset-backend:latest
-    env_file: backend/.env
-    depends_on: [db, redis]
-    ports:
-      - "3001:3001"
-    restart: unless-stopped
-
-  frontend:
-    image: ninjasset-frontend:latest
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-
-volumes:
-  pgdata:
-\`\`\`
-
-## Building production images
+The repo ships a full \`docker-compose.yml\`: PostgreSQL, Redis, **Qdrant**, **aiagent** (RAG service), backend, and frontend.
 
 \`\`\`bash
-# Backend
-cd backend
-npm run build
-npm start
+cp backend/.env.example backend/.env
+cp aiagent/.env.example aiagent/.env
+# backend: AI_ASSISTANT_ENABLED=true, AI_AGENT_API_KEY=...
+# aiagent: GROK_API_KEY=..., same AI_AGENT_API_KEY
 
-# Frontend
-cd frontend
-npm run build
-npm start
+docker compose --env-file backend/.env pull
+docker compose --env-file backend/.env up -d
 \`\`\`
 
-Set \`NODE_ENV=production\` before building.
+| Service | Image | Notes |
+|---|---|---|
+| \`postgres\`, \`redis-server\` | Official images | Persistent volumes |
+| \`qdrant\` | \`qdrant/qdrant\` | Vector store for RAG |
+| \`aiagent\` | \`ghcr.io/<owner>/ninjasset-aiagent\` | ~2 GB (deps only); embedding model via volume |
+| \`backend\` | \`ghcr.io/<owner>/ninjasset-backend\` | Migrations on startup; \`/app/uploads\` volume |
+| \`frontend\` | \`ghcr.io/<owner>/ninjasset-frontend\` | nginx on port 3000 |
+
+**Embedding model:** the aiagent image does not include the ~1.1 GB Hugging Face weights. Compose bind-mounts \`~/.cache/huggingface\` by default (override with \`HF_CACHE_DIR\` in a \`.env\` next to \`docker-compose.yml\`).
+
+Images are published on version tags (\`v*\`) to GitHub Container Registry. Log in with \`docker login ghcr.io\` if packages are private.
+
+## Building production images locally
+
+\`\`\`bash
+docker build -t ninjasset-backend backend/
+docker build -t ninjasset-frontend frontend/
+docker build -t ninjasset-aiagent aiagent/
+\`\`\`
+
+Or build backend/frontend on the host with \`npm run build\` and set \`NODE_ENV=production\`.
 
 ## Running database migrations
 

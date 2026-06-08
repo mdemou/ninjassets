@@ -24,6 +24,8 @@ src/ai_service/
     schemas.py  deps.py
   jobs/reindex.py          CLI: python -m ai_service.jobs.reindex
 tests/                     pytest with fake store + fake LLM
+Dockerfile                 CPU-only PyTorch; models loaded at runtime (not baked in)
+entrypoint.sh              Pre-download embedding + spaCy models before uvicorn
 ```
 
 ## Endpoints
@@ -48,17 +50,20 @@ cp .env.example .env          # set GROK_API_KEY (+ QDRANT_URL if not localhost)
 uv run uvicorn ai_service.main:app --reload   # http://localhost:8000/docs
 ```
 
-First run downloads the models (see below). Qdrant must be reachable (`docker compose -f
-../docker-compose-ai.yml up qdrant`).
+First run downloads the models (see below). Qdrant must be reachable:
 
-## Models (downloaded locally, no data leaves for embeddings/PII)
+```bash
+docker compose up -d qdrant   # from repo root
+```
+
+## Models (downloaded at runtime, not baked into the image)
 
 | Model | Purpose | Size | Where |
 |-------|---------|------|-------|
 | `intfloat/multilingual-e5-base` | embeddings (768-dim) | ~1.1 GB | `$HF_HOME` (default `~/.cache/huggingface`) |
-| `en_core_web_sm` / `es_core_news_md` | Presidio NER | ~12 MB / ~40 MB | site-packages |
+| `en_core_web_sm` / `es_core_news_md` | Presidio NER | ~12 MB / ~40 MB | site-packages (downloaded on first start in Docker) |
 
-The HF model auto-downloads on first use. spaCy models:
+The HF model auto-downloads on first use. spaCy models for local dev:
 
 ```bash
 uv run python -m spacy download en_core_web_sm
@@ -66,7 +71,30 @@ uv run python -m spacy download es_core_news_md
 ```
 
 **e5 requires prefixes** — the embedder adds `query: ` / `passage: ` automatically
-(`adapters/embedder.py`). The Dockerfile bakes all models so containers start offline (§14.4).
+(`adapters/embedder.py`).
+
+### Docker image
+
+The published image (`ghcr.io/<owner>/ninjasset-aiagent`) is ~**2 GB** — Python deps and
+**CPU-only** PyTorch only. The ~1.1 GB embedding weights are **not** in the image; mount a host
+or named volume at `HF_HOME` (`/models/hf` in the container).
+
+```bash
+docker build -t ninjasset-aiagent aiagent/
+```
+
+`entrypoint.sh` loads the embedding model from `HF_HOME` and downloads spaCy models before
+uvicorn starts. First boot with an empty volume downloads ~1.1 GB (allow several minutes).
+
+In the root `docker-compose.yml`, the HF cache is bind-mounted from the host by default:
+
+```yaml
+volumes:
+  - ${HF_CACHE_DIR:-${HOME}/.cache/huggingface}:/models/hf
+```
+
+Override with `HF_CACHE_DIR` in a `.env` next to `docker-compose.yml` if your cache lives
+elsewhere.
 
 ## Reindex
 

@@ -9,18 +9,23 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir uv
 
-# Install dependencies from the lock-free pyproject (src layout, hatchling).
 COPY pyproject.toml README.md ./
 COPY src/ ./src/
-RUN uv pip install --system --no-cache .
 
-# Bake the models so containers start offline (SPEC §14.4):
-#  - multilingual-e5-base embeddings (~1.1 GB) into HF_HOME
-#  - spaCy NER models for Presidio (EN + ES)
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')" \
- && python -m spacy download en_core_web_sm \
- && python -m spacy download es_core_news_md
+# Resolve torch from the CPU wheel index. A plain `pip install .` pulls CUDA torch
+# plus ~3 GB of nvidia-* / triton packages; reinstalling torch alone does not remove them.
+RUN uv pip install --system --no-cache \
+      --index-strategy unsafe-best-match \
+      --extra-index-url https://download.pytorch.org/whl/cpu \
+      . \
+ && (pip list --format=freeze \
+      | grep -E '^(nvidia-|triton)=' \
+      | cut -d= -f1 \
+      | xargs -r uv pip uninstall --system || true)
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["uvicorn", "ai_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/entrypoint.sh"]

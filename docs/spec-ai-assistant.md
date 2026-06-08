@@ -168,7 +168,7 @@ the indexed corpus is primarily **English**.
 | Frontend | Chat UI, i18n, sources, conversation list, error states |
 | Backend | Auth, proxy, Postgres conversations, rate limit, feature flag |
 | aiagent | Embeddings, Qdrant, LLM, Presidio, RAG prompts |
-| Qdrant | Vector store (`docker-compose-ai.yml` → `qdrant`) |
+| Qdrant | Vector store (`docker-compose.yml` → `qdrant`) |
 | Indexer | Offline job: corpus → chunk → embed → upsert Qdrant |
 
 ### 6.4 AI service architecture (resolved)
@@ -299,7 +299,7 @@ Replace hardcoded Spanish RAG prompt. Template per `locale`:
 |--------|-------------|
 | When | **Always anonymize before any external LLM call.** Replace PII in the query + retrieved context with placeholders, call the LLM, then **deanonymize** the answer so the admin sees real values but the provider never does. |
 | Entities | Emails, person names, phone numbers, locations (Presidio built-ins) **+ custom recognizers for asset serial numbers** and other domain identifiers. |
-| Languages | spaCy NER per locale (`en_core_web_sm` + `es_core_news_md`), baked into the image (§14.4). |
+| Languages | spaCy NER per locale (`en_core_web_sm` + `es_core_news_md`); downloaded at container start (§14.4). |
 | Streaming | Deanonymize the **token stream**, buffering across chunk boundaries so a placeholder split between two SSE chunks is still restored (§9.5, §22). |
 | P2 | Tune recognizers; add more domain identifiers; optional reversible-mapping store if needed. |
 
@@ -584,14 +584,15 @@ disabled) with `t('ai.errorUnavailable')`.
 
 ### 14.1 Docker Compose
 
-Extend `docker-compose-ai.yml` (or equivalent):
+Root `docker-compose.yml` includes:
 
 | Service | Notes |
 |---------|-------|
-| `qdrant` | Existing |
-| `aiagent` | Build from `aiagent/`; depends on qdrant |
-| `backend` | Existing; add `AI_AGENT_*` env |
-| Indexer | One-shot container or CI step before aiagent start |
+| `qdrant` | Vector store; named volume for persistence |
+| `aiagent` | Image `ghcr.io/<owner>/ninjasset-aiagent`; depends on `qdrant`; `HF_HOME` bind-mount or named volume |
+| `backend` | `AI_AGENT_URL=http://aiagent:8000`; depends on healthy aiagent |
+| `frontend` | Unchanged |
+| Indexer | `POST /knowledge/reindex` or `AI_AUTO_INDEX_ON_START=true` (corpus must be reachable in container) |
 
 ### 14.2 Environment variables
 
@@ -617,10 +618,11 @@ Optional: backend pings aiagent `/health` + Qdrant `/readyz`. Degraded → disab
 
 | Concern | Approach |
 |---------|----------|
-| First-use download | **Bake into the image**: `RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"` so containers start offline |
-| Cache reuse (dev) | Mount `~/.cache/huggingface` (or set `HF_HOME`) as a volume so the ~1.1 GB model isn't re-downloaded |
+| Image size | ~2 GB: Python deps + **CPU-only** PyTorch (`--extra-index-url https://download.pytorch.org/whl/cpu`). CUDA wheels and `nvidia-*` packages are not installed. |
+| HF weights (~1.1 GB) | **Not** in the image. `entrypoint.sh` loads `EMBEDDING_MODEL_HF` into `HF_HOME` on start. |
+| Cache reuse | Bind-mount host `~/.cache/huggingface` → `/models/hf` (`HF_CACHE_DIR` in Compose), or use a named volume. |
 | Dimension lock | Collection created `size=768, distance=Cosine`; changing the model requires a full reindex (§8.4) |
-| spaCy NER models | Bake `en_core_web_sm` + `es_core_news_md` into the image for Presidio (§7.6) |
+| spaCy NER models | Downloaded by `entrypoint.sh` on first start (~50 MB); not baked into the image |
 
 ## 15. Acceptance criteria — REQ-AI-ASSISTANT-001
 
@@ -707,7 +709,7 @@ final event → sources DTO.
 | D10 | v1 retrieval | **Forced-RAG**, not an agentic retriever-tool |
 | D11 | aiagent state | **Stateless**; no LangGraph checkpointer in v1 |
 | D12 | Reindex | **Full wipe & recreate** CLI + auto-bootstrap on startup |
-| D13 | Embeddings | `multilingual-e5-base`, `query:`/`passage:` prefixes, baked into image |
+| D13 | Embeddings | `multilingual-e5-base`, `query:`/`passage:` prefixes, runtime download to `HF_HOME` volume |
 | D14 | Presidio (PII) | **v1 required**: anonymize emails/serials/names pre-LLM, deanonymize after; custom serial recognizer |
 | D15 | Streaming | **SSE in v1**; persist the turn on `[DONE]`; empty-retrieval is non-stream |
 | D16 | Tracing | Langfuse/LangSmith **optional**, off by default (no-op unless env set) |
@@ -725,8 +727,8 @@ final event → sources DTO.
 
 ### 19.2 README files
 
-- `README.md` (root) — AI assistant overview, `AI_*` env vars, `docker-compose-ai.yml`, reindex command
-- `aiagent/README.md` — **rewrite** for the new service: layout (§6.4), `uv` run, model download/baking (§14.4), e5 prefixes, reindex CLI, tests
+- `README.md` (root) — AI assistant overview, `AI_*` env vars, `docker-compose.yml` (qdrant + aiagent), reindex command
+- `aiagent/README.md` — layout (§6.4), `uv` run, Docker image + `HF_HOME` volume (§14.4), e5 prefixes, reindex CLI, tests
 - `backend/README.md` — `/api/p/ai/*` routes, proxy env vars, rate limit, feature flag
 - `e2e/README.md` — how the aiagent mock works for `ai-assistant/` specs
 
@@ -752,7 +754,7 @@ The public `/docs` site is **data-driven** (route `docs.$section.$page.tsx` rend
 | Vector store adapter | `aiagent/src/ai_service/infrastructure/adapters/qdrant_store.py` (`langchain-qdrant`) |
 | Embedder adapter | `aiagent/src/ai_service/infrastructure/adapters/embedder.py` (e5 prefixes) |
 | Indexer + sources | `aiagent/src/ai_service/domain/{indexer,sources}.py`, `jobs/reindex.py` |
-| Qdrant compose | `docker-compose-ai.yml` |
+| Qdrant + aiagent compose | `docker-compose.yml` |
 | Specs | `docs/spec-*.md` |
 | Public docs | `frontend/app/data/docs-pages.ts` |
 | OpenAPI export | `backend/scripts/export-openapi.ts` (`npm run export:openapi`) → `docs/openapi.json` |
