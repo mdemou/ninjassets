@@ -1,8 +1,9 @@
 name: Release
 
-# Full E2E gate + production Docker images on version tags.
+# Build and publish production Docker images on version tags.
 # Push a tag like `v1.0.0` to trigger this workflow, or run it manually
 # from the Actions tab and supply the version to publish.
+# E2E runs on branch pushes and PRs via ci.yml, not on release tags.
 on:
   push:
     tags:
@@ -18,94 +19,8 @@ permissions:
   packages: write
 
 jobs:
-  build-and-test:
-    name: Build & E2E
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-      redis:
-        image: redis:7.4.0-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.inputs.version || github.ref }}
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
-            e2e/package-lock.json
-
-      - name: Create env files
-        run: |
-          cp backend/.env.example backend/.env
-          cp e2e/.env.example e2e/.env
-          sed -i 's/^REDIS_PASSWORD=.*/REDIS_PASSWORD=/' backend/.env
-          sed -i 's/^REDIS_PASSWORD=.*/REDIS_PASSWORD=/' e2e/.env
-          sed -i 's/^MOCK_EMAIL=.*/MOCK_EMAIL=true/' backend/.env
-          sed -i 's/^MOCK_CAPTCHA=.*/MOCK_CAPTCHA=true/' backend/.env
-          sed -i 's#^SMTP_HOST=.*#SMTP_HOST=#' backend/.env
-
-      - name: Install backend dependencies
-        working-directory: backend
-        run: npm ci
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Install e2e dependencies
-        working-directory: e2e
-        run: npm ci
-
-      - name: Build backend
-        working-directory: backend
-        run: npm run build
-
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build
-
-      - name: Install Playwright browsers
-        working-directory: e2e
-        run: npx playwright install --with-deps chromium
-
-      - name: Run E2E tests
-        working-directory: e2e
-        run: npm test
-        env:
-          CI: "true"
-
   publish:
     name: Publish Docker images
-    needs: build-and-test
     runs-on: ubuntu-latest
 
     strategy:
