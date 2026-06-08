@@ -1,5 +1,6 @@
 import { type FormEvent, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { ChatMarkdown } from '~/components/ai/ChatMarkdown';
 import { Button } from '~/components/Button';
 import { Modal } from '~/components/Modal';
 import { PageContent } from '~/components/PageContent';
@@ -141,8 +142,8 @@ export default function AdminAi() {
     }
   };
 
-  const send = async () => {
-    const text = input.trim();
+  const send = async (override?: string) => {
+    const text = (override ?? input).trim();
     if (!text || streaming || disabled) return;
     setErrorKey(null);
 
@@ -283,8 +284,9 @@ export default function AdminAi() {
                     <button
                       key={key}
                       type="button"
-                      onClick={() => setInput(t(key))}
-                      className="rounded-lg border border-border px-4 py-2 text-sm text-muted transition-colors hover:bg-surface-alt hover:text-foreground"
+                      onClick={() => void send(t(key))}
+                      disabled={streaming || disabled}
+                      className="cursor-pointer rounded-lg border border-border px-4 py-2 text-sm text-muted transition-colors hover:bg-surface-alt hover:text-foreground disabled:cursor-default disabled:opacity-60"
                     >
                       {t(key)}
                     </button>
@@ -300,13 +302,23 @@ export default function AdminAi() {
                     data-testid={m.role === 'user' ? 'ai-message-user' : 'ai-message-assistant'}
                   >
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[0.9375rem] whitespace-pre-wrap break-words ${
+                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[0.9375rem] break-words ${
                         m.role === 'user'
-                          ? 'bg-primary text-white'
+                          ? 'whitespace-pre-wrap bg-primary text-white'
                           : 'border border-border bg-surface-alt text-foreground'
                       }`}
                     >
-                      {m.content || (m.pending ? <span className="text-muted">{t('ai.thinking')}</span> : '')}
+                      {m.role === 'assistant' ? (
+                        m.content ? (
+                          <ChatMarkdown content={m.content} />
+                        ) : m.pending ? (
+                          <span className="text-muted">{t('ai.thinking')}</span>
+                        ) : (
+                          ''
+                        )
+                      ) : (
+                        m.content
+                      )}
                       {m.role === 'assistant' && m.sources && m.sources.length > 0 && (
                         <details className="mt-3 border-t border-border/60 pt-2" data-testid="ai-sources">
                           <summary className="cursor-pointer text-xs font-medium text-muted">

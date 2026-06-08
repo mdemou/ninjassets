@@ -68,6 +68,10 @@ export const aiController = {
         .response(stream)
         .type('text/event-stream')
         .header('cache-control', 'no-cache')
+        // Disable hapi's gzip compression: it buffers tokens internally and would
+        // collapse the SSE stream into one burst, defeating incremental rendering.
+        // A preset content-encoding makes hapi skip its compressor (§9.5).
+        .header('content-encoding', 'identity')
         .header('x-accel-buffering', 'no');
     } catch (error) {
       logger.error(__filename, 'chat', 'error', error);
