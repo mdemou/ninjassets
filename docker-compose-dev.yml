@@ -1,0 +1,104 @@
+name: ninjasset-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ninjasset-dev-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-ninjasset_dev}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ninjasset-dev-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-server:
+    image: redis:7.4.0-alpine
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=your_secure_password
+    command:
+      [
+        "redis-server",
+        "--requirepass",
+        "your_secure_password",
+        "--appendonly",
+        "yes",
+      ]
+    volumes:
+      - ninjasset-dev-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "your_secure_password", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  qdrant:
+    image: docker.io/qdrant/qdrant:latest
+    container_name: qdrant-server
+    restart: always
+    ports:
+      - 6333:6333 # REST API
+      - 6334:6334 # gRPC
+    volumes:
+      - ninjasset-dev-qdrant-data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:6333/readyz",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  # backend:
+  #   image: ghcr.io/mdemou/ninjasset-backend:latest
+  #   container_name: ninjasset-dev-backend
+  #   env_file:
+  #     - backend/.env
+  #   environment:
+  #     DB_HOST: postgres
+  #     REDIS_HOST: redis-server
+  #     DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-ninjasset_dev}
+  #   ports:
+  #     - "${PORT:-3001}:3001"
+  #   volumes:
+  #     - ninjasset-dev-backend-uploads:/app/uploads
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis-server:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+  # frontend:
+  #   image: ghcr.io/mdemou/ninjasset-frontend:latest
+  #   container_name: ninjasset-dev-frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
+
+volumes:
+  ninjasset-dev-pgdata:
+  ninjasset-dev-redis-data:
+  ninjasset-dev-backend-uploads:
+  ninjasset-dev-qdrant-data:

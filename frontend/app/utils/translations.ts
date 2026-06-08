@@ -576,6 +576,10 @@ export const en = {
   'landing.showcase.sites.title': 'See where everything lives',
   'landing.showcase.sites.desc':
     'Organize assets by office, warehouse, or datacenter. Interactive maps and inherited coordinates keep location data consistent across your org.',
+  'landing.showcase.ai.eyebrow': 'AI assistant',
+  'landing.showcase.ai.title': 'Ask questions grounded in your docs',
+  'landing.showcase.ai.desc':
+    'Admins get streaming answers about features, workflows, configuration, and the HTTP API — with source citations from specs and OpenAPI, in English or Spanish.',
   'landing.features.title': 'Everything you need to run IT asset operations',
   'landing.features.subtitle':
     'From procurement to retirement, keep your inventory accurate and your audit trail clean.',
@@ -596,6 +600,9 @@ export const en = {
     'Surface missing fields, expiring warranties, and stale records before they become problems.',
   'landing.features.api.title': 'API & automation',
   'landing.features.api.desc': 'Bearer-key API and bulk import/export connect ninjasset to the rest of your stack.',
+  'landing.features.ai.title': 'AI assistant',
+  'landing.features.ai.desc':
+    'Admin-only RAG chat answers product and API questions with streamed replies, conversation history, and cited sources.',
   'landing.how.title': 'Up and running in three steps',
   'landing.how.step1.title': 'Add your assets',
   'landing.how.step1.desc': 'Import in bulk or add devices one by one, organized by category, manufacturer, and site.',
@@ -854,6 +861,32 @@ export const en = {
   'custodyDocument.previewTitle': 'Custody document preview',
   'custodyDocument.openNewTab': 'Open in new tab',
   'custodyDocument.previewUnavailable': 'Preview unavailable. Try opening in a new tab.',
+
+  // AI assistant (admin only — SPEC-AI-ASSISTANT-001)
+  'nav.adminAi': 'AI Assistant',
+  'ai.title': 'AI Assistant',
+  'ai.subtitle': 'Ask about ninjasset features, workflows, configuration, and the API.',
+  'ai.placeholder': 'Ask a question…',
+  'ai.send': 'Send',
+  'ai.stop': 'Stop',
+  'ai.sources': 'Sources',
+  'ai.viewSource': 'View source',
+  'ai.you': 'You',
+  'ai.assistant': 'Assistant',
+  'ai.thinking': 'Thinking…',
+  'ai.loading': 'Loading…',
+  'ai.noRelevantDocs': 'No relevant documentation was found for your question.',
+  'ai.errorUnavailable': 'The AI assistant is currently unavailable.',
+  'ai.rateLimited': 'You have reached the message limit. Please try again later.',
+  'ai.newConversation': 'New conversation',
+  'ai.conversations': 'Conversations',
+  'ai.noConversations': 'No conversations yet.',
+  'ai.deleteConversation': 'Delete conversation',
+  'ai.deleteConfirm': 'Delete this conversation? This cannot be undone.',
+  'ai.emptyTitle': 'How can I help?',
+  'ai.examplePrompt1': 'How do I create an API key?',
+  'ai.examplePrompt2': 'How do verified handovers work?',
+  'ai.examplePrompt3': 'How do I import assets from a spreadsheet?',
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -1439,6 +1472,10 @@ export const es: Record<TranslationKey, string> = {
   'landing.showcase.sites.title': 'Mira dónde está todo',
   'landing.showcase.sites.desc':
     'Organiza activos por oficina, almacén o datacenter. Mapas interactivos y coordenadas heredadas mantienen la ubicación coherente en toda la organización.',
+  'landing.showcase.ai.eyebrow': 'Asistente IA',
+  'landing.showcase.ai.title': 'Pregunta con respuestas basadas en la documentación',
+  'landing.showcase.ai.desc':
+    'Los administradores reciben respuestas en streaming sobre funciones, flujos, configuración y la API HTTP, con citas de especificaciones y OpenAPI, en inglés o español.',
   'landing.features.title': 'Todo lo que necesitas para gestionar tus activos de TI',
   'landing.features.subtitle':
     'Desde la compra hasta la baja, mantén tu inventario preciso y tu registro de auditoría impecable.',
@@ -1460,6 +1497,9 @@ export const es: Record<TranslationKey, string> = {
   'landing.features.api.title': 'API y automatización',
   'landing.features.api.desc':
     'La API con clave de acceso y la importación/exportación masiva conectan ninjasset con el resto de tu stack.',
+  'landing.features.ai.title': 'Asistente IA',
+  'landing.features.ai.desc':
+    'Chat RAG solo para administradores: responde sobre el producto y la API con respuestas en streaming, historial y fuentes citadas.',
   'landing.how.title': 'Operativo en tres pasos',
   'landing.how.step1.title': 'Añade tus activos',
   'landing.how.step1.desc':
@@ -1722,6 +1762,32 @@ export const es: Record<TranslationKey, string> = {
   'custodyDocument.previewTitle': 'Vista previa del documento de custodia',
   'custodyDocument.openNewTab': 'Abrir en una pestaña nueva',
   'custodyDocument.previewUnavailable': 'Vista previa no disponible. Prueba a abrir en una pestaña nueva.',
+
+  // Asistente IA (solo administradores — SPEC-AI-ASSISTANT-001)
+  'nav.adminAi': 'Asistente IA',
+  'ai.title': 'Asistente IA',
+  'ai.subtitle': 'Pregunta sobre funciones, flujos, configuración y la API de ninjasset.',
+  'ai.placeholder': 'Escribe tu pregunta…',
+  'ai.send': 'Enviar',
+  'ai.stop': 'Detener',
+  'ai.sources': 'Fuentes',
+  'ai.viewSource': 'Ver fuente',
+  'ai.you': 'Tú',
+  'ai.assistant': 'Asistente',
+  'ai.thinking': 'Pensando…',
+  'ai.loading': 'Cargando…',
+  'ai.noRelevantDocs': 'No se encontró documentación relevante para tu pregunta.',
+  'ai.errorUnavailable': 'El asistente de IA no está disponible en este momento.',
+  'ai.rateLimited': 'Has alcanzado el límite de mensajes. Inténtalo de nuevo más tarde.',
+  'ai.newConversation': 'Nueva conversación',
+  'ai.conversations': 'Conversaciones',
+  'ai.noConversations': 'Aún no hay conversaciones.',
+  'ai.deleteConversation': 'Eliminar conversación',
+  'ai.deleteConfirm': '¿Eliminar esta conversación? Esta acción no se puede deshacer.',
+  'ai.emptyTitle': '¿En qué puedo ayudarte?',
+  'ai.examplePrompt1': '¿Cómo creo una clave de API?',
+  'ai.examplePrompt2': '¿Cómo funcionan las entregas verificadas?',
+  'ai.examplePrompt3': '¿Cómo importo activos desde una hoja de cálculo?',
 };
 
 export const translations = { en, es };

@@ -38,8 +38,12 @@ All non-health routes require the `X-Internal-Key` header when `AI_AGENT_API_KEY
 
 ## Run locally
 
+**Prerequisites:** [uv](https://docs.astral.sh/uv/) (manages the virtualenv — no manual `venv`
+needed) and Python **3.12–3.13** (3.14 is not supported by spaCy yet). VS Code launch/tasks live
+in the repo root `.vscode/`.
+
 ```bash
-uv sync
+uv sync                       # creates aiagent/.venv
 cp .env.example .env          # set GROK_API_KEY (+ QDRANT_URL if not localhost)
 uv run uvicorn ai_service.main:app --reload   # http://localhost:8000/docs
 ```
@@ -73,9 +77,20 @@ uv run python -m ai_service.jobs.reindex
 ```
 
 Sources are resolved relative to `CORPUS_ROOT` (default `..`, the repo root):
-`docs/spec-*.md`, `frontend/app/data/docs-pages.ts`, and an exported `openapi.json`
-(or fetched from `OPENAPI_URL`). On startup, if `AI_AUTO_INDEX_ON_START=true` and the
-collection is empty, it self-populates.
+`docs/spec-*.md`, `frontend/app/data/docs-pages.ts`, and `docs/openapi.json`. On startup,
+if `AI_AUTO_INDEX_ON_START=true` and the collection is empty, it self-populates.
+
+**OpenAPI is a static file**, generated offline from the backend (no running server, no
+DB connection — it builds the hapi app in memory and dumps hapi-swagger's `/docs.json`):
+
+```bash
+cd ../backend && npm run export:openapi   # writes docs/openapi.json
+```
+
+You don't normally run this by hand: **CI regenerates and commits `docs/openapi.json`
+automatically** when backend routes change (`.github/workflows/openapi.yml`). The command above
+is just for refreshing it locally. The backend never has to be **up** for the assistant to work —
+not at query time and not at index time.
 
 ## PII
 

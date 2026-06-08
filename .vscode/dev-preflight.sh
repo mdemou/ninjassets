@@ -57,4 +57,13 @@ if [ ! -d "$ROOT/frontend/node_modules" ]; then
   ( cd "$ROOT/frontend" && npm install ) >>"$LOG_DIR/frontend.log" 2>&1 || exit 1
 fi
 
+if [ -f "$ROOT/aiagent/pyproject.toml" ]; then
+  if ! have uv; then
+    warn "uv not found — install from https://docs.astral.sh/uv/ then run: cd aiagent && uv sync"
+  elif [ ! -d "$ROOT/aiagent/.venv" ]; then
+    info "Installing aiagent dependencies (uv sync)…"
+    ( cd "$ROOT/aiagent" && uv sync ) >>"$LOG_DIR/aiagent.log" 2>&1 || exit 1
+  fi
+fi
+
 info "Preflight complete."

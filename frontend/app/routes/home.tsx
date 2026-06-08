@@ -138,7 +138,7 @@ export default function Home() {
   return (
     <PageContent size="wide">
       <h1 className="text-3xl font-semibold mb-1">{t('dashboard.title')}</h1>
-      <p className="text-muted mb-6">
+      <p className="text-sm text-muted mb-4">
         {t('dashboard.welcome')}
         {user?.displayName ? `, ${user.displayName}` : ''}!
       </p>

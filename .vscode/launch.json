@@ -59,6 +59,27 @@
       "runtimeArgs": ["dev"],
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Dev: AI Agent",
+      "type": "node-terminal",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/aiagent",
+      "command": "${workspaceFolder}/aiagent/.venv/bin/uvicorn ai_service.main:app --reload --port 8000"
+    },
+    {
+      "name": "Debug AI Agent",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["ai_service.main:app", "--reload", "--port", "8000"],
+      "python": "${workspaceFolder}/aiagent/.venv/bin/python",
+      "cwd": "${workspaceFolder}/aiagent",
+      "envFile": "${workspaceFolder}/aiagent/.env",
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "jinja": true
     }
   ],
   "compounds": [

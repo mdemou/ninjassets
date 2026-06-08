@@ -4,6 +4,9 @@ const configDefinition = {
   signupEnabled: process.env.SIGNUP_ENABLED !== 'false',
   mockCaptcha: process.env.MOCK_CAPTCHA === 'true',
   mockEmail: process.env.MOCK_EMAIL === 'true',
+  // Admin AI assistant (SPEC-AI-ASSISTANT-001). MOCK_AI returns canned SSE from the
+  // backend (no aiagent/Qdrant/LLM) — mirrors MOCK_EMAIL/MOCK_CAPTCHA for E2E (D18).
+  mockAi: process.env.MOCK_AI === 'true',
   /** Password must be at least 8 chars with one uppercase, one lowercase, and one digit */
   passwordRegex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
   logLevel: process.env.LOG_LEVEL || 'info',
@@ -105,6 +108,23 @@ const configDefinition = {
   },
   apiIdempotency: {
     ttlHours: Number(process.env.API_IDEMPOTENCY_TTL_HOURS) || 24,
+  },
+  // Admin AI assistant (SPEC-AI-ASSISTANT-001). Backend proxies to the stateless
+  // aiagent RAG service and owns conversation history + rate limiting + feature flag.
+  ai: {
+    // Feature flag — off unless explicitly enabled (or running in MOCK_AI mode).
+    enabled: process.env.AI_ASSISTANT_ENABLED === 'true',
+    agentUrl: process.env.AI_AGENT_URL || 'http://localhost:8000',
+    agentApiKey: process.env.AI_AGENT_API_KEY || '',
+    topK: Number(process.env.AI_TOP_K) || 5,
+    messageMaxLength: Number(process.env.AI_MESSAGE_MAX_LENGTH) || 2000,
+    messageMinLength: Number(process.env.AI_MESSAGE_MIN_LENGTH) || 3,
+    // Last N messages (≈3 turns) sent to the LLM as context (§9.2).
+    historyMessages: Number(process.env.AI_HISTORY_MESSAGES) || 6,
+    // Rate limit: messages per admin per hour (Redis fixed window).
+    rateLimitPerHour: Number(process.env.AI_RATE_LIMIT_PER_HOUR) || 30,
+    // Upstream request timeout for the aiagent SSE call.
+    agentTimeoutMs: Number(process.env.AI_AGENT_TIMEOUT_MS) || 60_000,
   },
   // Outbound webhooks to Slack/Discord/Telegram (SPEC-WEBHOOK-001).
   webhooks: {

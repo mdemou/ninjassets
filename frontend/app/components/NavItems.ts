@@ -101,6 +101,13 @@ const navConfig: NavConfig[] = [
     adminOnly: true,
     adminSubsection: 'platform',
   },
+  {
+    labelKey: 'nav.adminAi',
+    to: '/admin/ai',
+    authenticated: true,
+    adminOnly: true,
+    adminSubsection: 'platform',
+  },
 ];
 
 const adminSubsectionLabelKeys: Record<AdminSubsection, TranslationKey> = {

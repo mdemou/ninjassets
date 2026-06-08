@@ -1,9 +1,9 @@
 # Feature specification: Admin AI assistant (full RAG)
 
 - **Document ID:** SPEC-AI-ASSISTANT-001
-- **Status:** Draft (implementation decisions resolved 2026-06-07 — see §6.4, §18)
-- **Last updated:** 2026-06-07
-- **Related requirements (E2E):** REQ-AI-ASSISTANT-001 (TBD — `e2e/tests/ai-assistant/`)
+- **Status:** Implemented (v1) — see §6.4, §18
+- **Last updated:** 2026-06-08
+- **Related requirements (E2E):** REQ-AI-ASSISTANT-001 — `e2e/tests/ai-assistant/req-ai-001.spec.ts` (9 tests; aiagent mocked via `MOCK_AI`)
 - **Depends on:** [spec-platform-access-model.md](spec-platform-access-model.md), [spec-internationalization.md](spec-internationalization.md), [spec-api-automation.md](spec-api-automation.md), [spec-health-operations.md](spec-health-operations.md)
 
 > **v1 approach.** Admin-only chatbot using **full RAG**: every answer is grounded in chunks
@@ -321,9 +321,11 @@ All sources ingested into **one Qdrant collection** (default: `documents`).
 |-----------|--------|------------|
 | `spec-*` | `docs/spec-*.md` | `spec` |
 | `user-docs` | `frontend/app/data/docs-pages.ts` (extract `content` at index time) | `user-doc` |
-| `openapi` | Exported `/docs.json` from running backend at index time | `openapi` |
+| `openapi` | `docs/openapi.json` — generated **offline** by `npm run export:openapi` (in-memory hapi-swagger dump; no running server/DB) | `openapi` |
 
-**Not live-fetched at query time.** OpenAPI is pre-exported during CI/reindex.
+**Not live-fetched, ever.** OpenAPI is a static `docs/openapi.json` regenerated only when the
+API changes (`backend/scripts/export-openapi.ts`, run via `npm run export:openapi`). The backend
+needs to be **up neither at query time nor at index time** — only the file is read.
 
 ### 8.2 Chunking
 
@@ -401,7 +403,7 @@ recognizer) before the external LLM call; the streamed answer is deanonymized on
 | Transport | **SSE** (`text/event-stream`) aiagent → backend → frontend |
 | Token events | `data: {"delta": "..."}` — appended in the UI as they arrive |
 | Final event | `data: {"sources": [...], "conversationId": "..."}` then `data: [DONE]` |
-| Empty retrieval | **No stream** — single 200 JSON with `ai.noRelevantDocs` + `sources: []` (§9.3) |
+| Empty retrieval | Single SSE event `{"empty": true, "sources": []}` then `[DONE]`; UI shows `ai.noRelevantDocs` (one content-type per endpoint) (§9.3) |
 | Persistence | Backend buffers the full assistant text while streaming; writes `ai_message` on `[DONE]` (or on client disconnect, with what was received) |
 | Deanonymization | Applied to the stream before it reaches the client (§7.6) |
 | Errors mid-stream | Emit a terminal `data: {"error": "..."}` event; UI shows `ai.errorUnavailable` |
@@ -438,7 +440,7 @@ All routes: `auth: 'JWTAdmin'`. Optional `app.capability: 'ai:assistant'` (MVP a
 | `locale` | Required: `en` \| `es` |
 
 **Response** — `text/event-stream` (SSE, §9.5). Token events carry `delta`; a final event carries
-`sources` + `conversationId`, then `[DONE]`. Empty retrieval returns a single non-stream JSON (§9.3).
+`sources` + `conversationId`, then `[DONE]`. Empty retrieval is the SSE event `{"empty": true}` (§9.3).
 
 ```
 data: {"delta": "To create an API key, "}
@@ -626,7 +628,7 @@ Optional: backend pings aiagent `/health` + Qdrant `/readyz`. Degraded → disab
 |----|---------------------|
 | AC-001.1 | Admin logged in → open chat in `/admin` → ask about API keys → answer references keys + ≥1 source. |
 | AC-001.2 | Regular user logged in → no chat UI on personal routes. |
-| AC-001.3 | User JWT → `POST /api/p/ai/chat` → 403. |
+| AC-001.3 | User JWT → `POST /api/p/ai/chat` → 401 (JWTAdmin session required; consistent with all `/api/p/*` admin routes). |
 | AC-001.4 | Off-corpus question (e.g. "weather today") → `noRelevantDocs`; empty sources. |
 | AC-001.5 | `AI_ASSISTANT_ENABLED=false` → 503; chat hidden or disabled. |
 | AC-001.6 | Second message with same `conversationId` → history visible; both stored. |
@@ -711,6 +713,7 @@ final event → sources DTO.
 | D16 | Tracing | Langfuse/LangSmith **optional**, off by default (no-op unless env set) |
 | D17 | UI placement | **Admin sidebar item** (not a floating button) |
 | D18 | Tests | aiagent owns pytest; chat UX in shared Playwright via backend `MOCK_AI` |
+| D19 | OpenAPI source | Static `docs/openapi.json`, generated **offline** (`npm run export:openapi`); auto-regenerated + committed by CI on route changes. Backend never needs to be up; no `OPENAPI_URL` |
 
 ## 19. Documentation updates (post-implementation)
 
@@ -718,7 +721,7 @@ final event → sources DTO.
 
 - `docs/spec-index.md` — register SPEC-AI-ASSISTANT-001
 - `docs/e2e-testing.md` — document the `ai-assistant/` folder + aiagent-mock pattern
-- `CONTRIBUTING.md` — "reindex the corpus after editing specs/docs/API" note
+- `CONTRIBUTING.md` — "reindex the corpus after editing specs/docs" note (OpenAPI auto-regenerates via `.github/workflows/openapi.yml`)
 
 ### 19.2 README files
 
@@ -749,11 +752,11 @@ The public `/docs` site is **data-driven** (route `docs.$section.$page.tsx` rend
 | Vector store adapter | `aiagent/src/ai_service/infrastructure/adapters/qdrant_store.py` (`langchain-qdrant`) |
 | Embedder adapter | `aiagent/src/ai_service/infrastructure/adapters/embedder.py` (e5 prefixes) |
 | Indexer + sources | `aiagent/src/ai_service/domain/{indexer,sources}.py`, `jobs/reindex.py` |
-| Reference to port from | `_python/` (library wiring), `aiagent/` legacy (chunker, RAG flow) |
 | Qdrant compose | `docker-compose-ai.yml` |
 | Specs | `docs/spec-*.md` |
 | Public docs | `frontend/app/data/docs-pages.ts` |
-| OpenAPI | Backend `/docs.json` |
+| OpenAPI export | `backend/scripts/export-openapi.ts` (`npm run export:openapi`) → `docs/openapi.json` |
+| OpenAPI auto-regen (CI) | `.github/workflows/openapi.yml` (regenerates + commits on route changes) |
 | Admin auth | `spec-platform-access-model.md` — `JWTAdmin`, `/api/p/*` |
 | i18n | `spec-internationalization.md` — `LanguageProvider`, `translations.ts` |
 

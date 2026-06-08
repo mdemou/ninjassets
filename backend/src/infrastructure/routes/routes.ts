@@ -155,8 +155,18 @@ import {
   adminListImportPresetsRoute,
   adminSetImportMappingRoute,
 } from './admin/importExport/importExport.route';
+import {
+  aiChatRoute,
+  aiDeleteConversationRoute,
+  aiGetConversationRoute,
+  aiListConversationsRoute,
+} from './admin/ai/ai.route';
 
 export const routes: ServerRoute[] = [
+  aiChatRoute,
+  aiListConversationsRoute,
+  aiGetConversationRoute,
+  aiDeleteConversationRoute,
   adminListUsersRoute,
   adminGetUserDetailsRoute,
   adminCreateUserRoute,

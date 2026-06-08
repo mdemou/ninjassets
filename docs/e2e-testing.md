@@ -96,6 +96,7 @@ The suite is requirement-backed and exercises the whole platform built so far. T
 | `webhooks/` | `REQ-WEBHOOK-001` | [spec-webhooks-notifications.md](spec-webhooks-notifications.md) | Event catalog + Slack/Discord/Telegram destinations: CRUD, masked target, per-destination subscription filtering, disabled = no delivery, failure isolation, admin-only (mock receiver) |
 | `api-automation/` | `REQ-API-001` | [spec-api-automation.md](spec-api-automation.md) | Bearer API keys, `JWTAdminOrApiKey`, machine access to `/api/p/*` |
 | `import-export/` | `REQ-IMPORT-001..002` | [spec-import-export.md](spec-import-export.md) | Template download, upload → map → dry-run → commit (asset create), FULL export round-trips `id`, duplicate-serial dry-run error, admin-only gate |
+| `ai-assistant/` | `REQ-AI-ASSISTANT-001` | [spec-ai-assistant.md](spec-ai-assistant.md) | Admin RAG chat: streamed answer + source citation, off-corpus → no-relevant-docs, multi-turn persistence, EN/ES answers + labels, conversation list CRUD, user-excluded (no item + 401), disabled-flag overlay. **aiagent mocked at the backend via `MOCK_AI=true`** (no Qdrant/LLM); PII covered by aiagent pytest |
 | `admin-qr-print.spec.ts` | — | [spec-asset-media-qr.md](spec-asset-media-qr.md) | QR label print page |
 | `smoke.spec.ts` | — | [spec-health-operations.md](spec-health-operations.md) | Infrastructure connectivity |
 

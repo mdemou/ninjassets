@@ -434,6 +434,41 @@ export interface LoginResponseData {
 
 export interface PublicConfigData {
   signupEnabled: boolean;
+  aiEnabled: boolean;
+}
+
+/** One source chunk cited under an assistant message (SPEC-AI-ASSISTANT-001). */
+export interface AiSource {
+  documentName: string;
+  documentId: string;
+  excerpt: string;
+  score: number;
+}
+
+export interface AiConversation {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AiMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  locale: 'en' | 'es';
+  sources: AiSource[] | null;
+  createdAt: string;
+}
+
+export interface ListAiConversationsData {
+  conversations: AiConversation[];
+  total: number;
+}
+
+export interface GetAiConversationData {
+  conversation: AiConversation;
+  messages: AiMessage[];
 }
 
 export interface ApiKey {

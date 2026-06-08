@@ -15,8 +15,6 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import httpx
-
 from ai_service.config import Settings
 from ai_service.logging import logger
 
@@ -46,7 +44,7 @@ def load_documents(settings: Settings) -> list[RawDoc]:
     docs: list[RawDoc] = []
     docs += _load_specs(root, settings.specs_glob)
     docs += _load_docs_pages(root / settings.docs_pages_file)
-    docs += _load_openapi(root / settings.openapi_file, settings.openapi_url)
+    docs += _load_openapi(root / settings.openapi_file)
     logger.info("loaded %d source documents from %s", len(docs), root)
     return docs
 
@@ -114,16 +112,13 @@ def _load_docs_pages(path: Path) -> list[RawDoc]:
 
 
 # ── openapi ──────────────────────────────────────────────────────────────────
-def _load_openapi(path: Path, url: str | None) -> list[RawDoc]:
-    if path.exists():
-        spec = json.loads(path.read_text(encoding="utf-8"))
-    elif url:
-        logger.info("fetching OpenAPI from %s", url)
-        spec = httpx.get(url, timeout=30).raise_for_status().json()
-    else:
-        logger.warning("no OpenAPI file (%s) or OPENAPI_URL set (skipping)", path)
+def _load_openapi(path: Path) -> list[RawDoc]:
+    """Read the OpenAPI JSON exported offline by `npm run export:openapi` (§8.1)."""
+    if not path.exists():
+        logger.warning("OpenAPI file not found: %s (run `npm run export:openapi`; skipping)", path)
         return []
 
+    spec = json.loads(path.read_text(encoding="utf-8"))
     out: list[RawDoc] = []
     for route, methods in spec.get("paths", {}).items():
         for method, op in methods.items():

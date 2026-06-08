@@ -59,9 +59,8 @@ class Settings(BaseSettings):
     corpus_root: str = ".."
     specs_glob: str = "docs/spec-*.md"
     docs_pages_file: str = "frontend/app/data/docs-pages.ts"
-    openapi_file: str = "openapi.json"
-    # Optional: fetch the OpenAPI doc at reindex time if the file is absent.
-    openapi_url: str | None = None
+    # Generated offline by the backend: `npm run export:openapi` (no running server).
+    openapi_file: str = "docs/openapi.json"
 
     # ── Tracing (optional; off unless both keys set) ─────────────────────────
     langfuse_public_key: str | None = None

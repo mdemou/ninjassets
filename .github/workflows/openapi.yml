@@ -1,0 +1,56 @@
+name: OpenAPI spec
+
+# Keep docs/openapi.json (the AI assistant's API corpus, SPEC-AI-ASSISTANT-001 §8.1)
+# in sync with the backend routes — automatically, so nobody regenerates by hand.
+# Generation is OFFLINE: it builds the hapi app in memory and dumps hapi-swagger's
+# /docs.json (no running server, no DB). Runs only when the API surface changes.
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "backend/src/infrastructure/routes/**"
+      - "backend/src/infrastructure/plugins/plugins.ts"
+      - "backend/scripts/export-openapi.ts"
+      - "backend/package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    name: Export & commit docs/openapi.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Create backend env (offline export needs no real secrets)
+        run: cp backend/.env.example backend/.env
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Export OpenAPI
+        working-directory: backend
+        run: npm run export:openapi
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- docs/openapi.json; then
+            echo "docs/openapi.json already up to date."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/openapi.json
+          git commit -m "chore: regenerate docs/openapi.json [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}

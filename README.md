@@ -5,7 +5,7 @@
 
 # NinjAsset
 
-Self-hosted IT asset management (ITAM): inventory lifecycle, sites and maps, custody via magic-link handovers and printable signed receipts, bulk assign and import/export, data-quality alerts (with dismissals), audit history, and automation via API keys and webhooks / integrations.
+Self-hosted IT asset management (ITAM): inventory lifecycle, sites and maps, custody via magic-link handovers and printable signed receipts, bulk assign and import/export, data-quality alerts (with dismissals), audit history, automation via API keys and webhooks / integrations, and an admin-only AI assistant (RAG over specs, docs, and OpenAPI).
 
 ## Screenshots
 
@@ -27,11 +27,11 @@ Captured from a local dev stack with demo data (`npm run seed:demo`).
 | :---------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------: |
 | <img src="docs/screenshots/admin-integrations.png" alt="Webhook integrations for Slack, Discord, and Telegram" width="600" /> | <img src="docs/screenshots/admin-import-export.png" alt="Bulk import and export hub" width="600" /> |
 
-|                                                      Personal workspace                                                       |
-| :---------------------------------------------------------------------------------------------------------------------------: |
-| <img src="docs/screenshots/personal-dashboard.png" alt="Personal dashboard for assignees with assigned assets" width="600" /> |
+|                                                      Personal workspace                                                       |                                                     AI assistant (admin)                                                      |
+| :---------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/personal-dashboard.png" alt="Personal dashboard for assignees with assigned assets" width="600" /> | <img src="docs/screenshots/admin-ai.png" alt="Admin AI assistant chat with streamed answer and source citation" width="600" /> |
 
-To refresh these images after UI changes, start the app on port 3000 and run `cd e2e && node scripts/capture-readme-screenshots.mjs`.
+To refresh these images after UI changes, start the app on port 3000 (with `AI_ASSISTANT_ENABLED=true` for the AI screenshot) and run `cd e2e && node scripts/capture-readme-screenshots.mjs`.
 
 ## Table of contents
 
@@ -63,6 +63,7 @@ To refresh these images after UI changes, start the app on port 3000 and run `cd
 - **API automation** — Bearer API keys for machine access to admin endpoints. [Spec](docs/spec-api-automation.md)
 - **Webhooks / Integrations** — Slack, Discord, and Telegram destinations on domain events. [Spec](docs/spec-webhooks-notifications.md)
 - **Bulk import/export** — Admin hub (`/admin/import-export`) to migrate or export assets, sites, users, and catalog via CSV/XLSX/JSON with column mapping, a mandatory dry-run, and async jobs. [Spec](docs/spec-import-export.md)
+- **AI assistant** — Admin-only RAG chat (`/admin/ai`): streamed answers about features, workflows, configuration, and the HTTP API, with source citations and EN/ES UI. Backend proxies to the stateless `aiagent` service (Qdrant + embeddings + LLM). [Spec](docs/spec-ai-assistant.md)
 - **Public landing & docs** — Marketing page at `/` (no API calls, no login/signup links); in-app docs at `/docs`; authentication at `/login` and `/register`. [Landing](docs/spec-public-landing.md) · [Auth](docs/spec-authentication.md)
 - **Auth & profile** — Registration, email verification, password reset, lockout, settings, EN/ES UI. Admins can set another user's password from the user directory. [Auth](docs/spec-authentication.md) · [Profile](docs/spec-profile-settings.md) · [Users](docs/spec-admin-user-management.md)
 
@@ -75,6 +76,10 @@ flowchart LR
   end
   subgraph api [Backend]
     Hapi[Hapi API :3001]
+  end
+  subgraph ai [AI optional]
+    AG[aiagent FastAPI :8000]
+    QD[(Qdrant)]
   end
   subgraph infra [Docker Compose]
     PG[(PostgreSQL 16)]
@@ -89,6 +94,8 @@ flowchart LR
   Hapi --> RD
   Hapi --> SCH
   Hapi --> Q
+  Hapi -.->|AI_ASSISTANT_ENABLED| AG
+  AG --> QD
   SCH --> RD
   Q --> RD
 ```
@@ -101,6 +108,7 @@ Admin routes use `/api/p/*`; personal routes use `/api/me/*` (see [platform acce
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Frontend             | React 19, React Router 7 (SPA), Tailwind CSS v4, Leaflet, Recharts                                                                                                                            |
 | Backend              | Node.js, Hapi, Knex, PostgreSQL                                                                                                                                                               |
+| AI assistant         | Python FastAPI (`aiagent`), LangChain + Qdrant, optional Ollama/OpenAI-compatible LLM                                                                                                         |
 | Jobs & notifications | Redis queues (webhooks, email, import/export wakeups) plus a Redis-backed periodic scheduler (token cleanup, API log retention, notification reaper, webhook alert scan, import/export sweep) |
 | Tests                | Playwright (isolated stack on ports 4000/4001)                                                                                                                                                |
 
@@ -196,6 +204,7 @@ Environment variables are split per service:
 | File | Purpose |
 | --- | --- |
 | `backend/.env` | API, Knex migrations, Docker Compose (`--env-file backend/.env`) |
+| `aiagent/.env` | AI service (Qdrant, embeddings, LLM, PII anonymization) — see [aiagent/README.md](aiagent/README.md) |
 | `e2e/.env` | Playwright tests (PostgreSQL + Redis connection only) |
 | `frontend/.env` | Optional dev-server overrides (`PORT`, `API_URL`) |
 
@@ -211,11 +220,13 @@ Environment variables are split per service:
 | `SIGNUP_ENABLED`                                                                                           | When `false`, disables registration API and UI (`GET /api/session/public-config`)                          |
 | `MOCK_CAPTCHA`, `MOCK_EMAIL`                                                                               | Simpler local testing (log mail to console when `SMTP_HOST` is empty)                                      |
 | `HANDOVER_TOKEN_EXPIRY_HOURS`                                                                              | Magic-link TTL (default 72)                                                                                |
+| `AI_ASSISTANT_ENABLED`, `MOCK_AI`, `AI_AGENT_URL`, `AI_AGENT_API_KEY`                                      | Admin AI assistant feature flag, E2E mock, and aiagent proxy ([spec](docs/spec-ai-assistant.md))           |
 
 Layer-specific guides:
 
 - [Backend README](backend/README.md) — API structure, migrations, layering, background jobs
 - [Frontend README](frontend/README.md) — SPA routes, providers, components
+- [aiagent README](aiagent/README.md) — RAG service, Qdrant corpus, reindex, local run
 
 Production-style runs: `npm run build && npm start` in each package after setting `NODE_ENV` and production secrets.
 
@@ -253,6 +264,7 @@ Specifications, E2E conventions, and feature design notes live in **[docs/](docs
 ninjasset/
 ├── frontend/     # React Router SPA
 ├── backend/      # Hapi API, Knex, domains
+├── aiagent/      # Admin AI assistant (RAG service)
 ├── e2e/          # Playwright tests
 ├── docs/         # Feature specs and guides
 └── docker-compose.yml
