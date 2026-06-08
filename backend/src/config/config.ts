@@ -58,13 +58,12 @@ const configDefinition = {
       db: Number(process.env.REDIS_DB) || 0,
       // Redis list keys used as job queues consumed by queueConsumer.
       queues: {
-        notifications: process.env.REDIS_NOTIFICATIONS_QUEUE || 'ninjasset:notifications',
+        notifications: 'ninjasset:notifications',
         // In-flight list for the reliable BRPOPLPUSH protocol (§7, at-least-once).
-        notificationsProcessing:
-          process.env.REDIS_NOTIFICATIONS_PROCESSING_QUEUE || 'ninjasset:notifications:processing',
+        notificationsProcessing: 'ninjasset:notifications:processing',
         // Import/export job queue (SPEC-IMPORT-001 D-IMPORT-2). The worker prefers
         // this Redis list and falls back to DB-status polling when Redis is down.
-        importExportJobs: process.env.REDIS_IMPORT_EXPORT_QUEUE || 'ninjasset:import-export',
+        importExportJobs: 'ninjasset:import-export',
       },
     },
   },
@@ -170,7 +169,7 @@ const configDefinition = {
     // Master switch for the consumer + reaper. Must stay independent of webhooks.enabled
     // so disabling webhooks never stops mandatory emails.
     enabled: process.env.NOTIFICATIONS_ENABLED !== 'false',
-    dedupKeyPrefix: process.env.NOTIFICATIONS_DEDUP_PREFIX || 'ninjasset:notif:dedup:',
+    dedupKeyPrefix: 'ninjasset:notif:dedup:',
     dedupTtlSec: Number(process.env.NOTIFICATIONS_DEDUP_TTL_SEC) || 24 * 60 * 60,
     reaperIntervalMs: Number(process.env.NOTIFICATIONS_REAPER_INTERVAL_MS) || 15_000,
     visibilityTimeoutMs: Number(process.env.NOTIFICATIONS_VISIBILITY_TIMEOUT_MS) || 60_000,
@@ -187,7 +186,7 @@ const configDefinition = {
     // Lock TTL (s): backstop release if a runner dies mid-job. > longest job runtime.
     lockTtlSec: Number(process.env.MAINTENANCE_LOCK_TTL_SEC) || 300,
     // Redis key prefix for lastRunAt + lock keys.
-    keyPrefix: process.env.MAINTENANCE_KEY_PREFIX || 'ninjasset:sched:',
+    keyPrefix: 'ninjasset:sched:',
     // Per-job cadences (ms).
     tokenCleanupMs: Number(process.env.TOKEN_CLEANUP_INTERVAL_MS) || 6 * 60 * 60 * 1000,
     apiRetentionPurgeMs: Number(process.env.API_RETENTION_PURGE_INTERVAL_MS) || 6 * 60 * 60 * 1000,

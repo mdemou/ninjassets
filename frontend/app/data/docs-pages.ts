@@ -218,9 +218,16 @@ Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **applicatio
 | \`REDIS_PORT\` | Redis port | \`6379\` |
 | \`REDIS_PASSWORD\` | Redis password (empty = no auth) | \`""\` |
 | \`REDIS_DB\` | Redis logical database index | \`0\` |
-| \`REDIS_NOTIFICATIONS_QUEUE\` | Unified notification job queue (webhooks + email) | \`ninjasset:notifications\` |
-| \`REDIS_NOTIFICATIONS_PROCESSING_QUEUE\` | In-flight list for BRPOPLPUSH at-least-once delivery | \`ninjasset:notifications:processing\` |
-| \`REDIS_IMPORT_EXPORT_QUEUE\` | Import/export job wakeup queue | \`ninjasset:import-export\` |
+
+**Hardcoded in \`config.ts\` (not environment variables):**
+
+| Config path | Purpose | Value |
+|---|---|---|
+| \`config.db.redis.queues.notifications\` | Unified notification job queue (webhooks + email) | \`ninjasset:notifications\` |
+| \`config.db.redis.queues.notificationsProcessing\` | In-flight list for BRPOPLPUSH at-least-once delivery | \`ninjasset:notifications:processing\` |
+| \`config.db.redis.queues.importExportJobs\` | Import/export job wakeup queue | \`ninjasset:import-export\` |
+| \`config.notifications.dedupKeyPrefix\` | Redis key prefix for delivery deduplication | \`ninjasset:notif:dedup:\` |
+| \`config.maintenance.keyPrefix\` | Redis prefix for scheduler last-run timestamps and locks | \`ninjasset:sched:\` |
 
 ### Server
 
@@ -311,7 +318,6 @@ Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **applicatio
 | Variable | Purpose | Default |
 |---|---|---|
 | \`NOTIFICATIONS_ENABLED\` | Consumer + reaper (independent of \`WEBHOOKS_ENABLED\`) | \`true\` |
-| \`NOTIFICATIONS_DEDUP_PREFIX\` | Redis key prefix for delivery deduplication | \`ninjasset:notif:dedup:\` |
 | \`NOTIFICATIONS_DEDUP_TTL_SEC\` | Dedup key TTL in seconds | \`86400\` |
 | \`NOTIFICATIONS_REAPER_INTERVAL_MS\` | How often stale in-flight jobs are reclaimed | \`15000\` |
 | \`NOTIFICATIONS_VISIBILITY_TIMEOUT_MS\` | Processing visibility timeout | \`60000\` |
@@ -331,18 +337,32 @@ Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **applicatio
 | \`IMPORT_SAFETY_SWEEP_MS\` | DB sweep when Redis wakeup was missed | \`30000\` |
 | \`IMPORT_EXPORT_NOTIFY_ON_COMPLETE\` | Email admin when a long job completes | \`false\` |
 
+### Admin AI assistant
+
+| Variable | Purpose | Default |
+|---|---|---|
+| \`AI_ASSISTANT_ENABLED\` | Feature flag — assistant is off unless \`true\` | \`false\` |
+| \`MOCK_AI\` | Canned SSE from backend (no aiagent); E2E/dev only | \`false\` |
+| \`AI_AGENT_URL\` | Base URL of the aiagent RAG service | \`http://localhost:8000\` |
+| \`AI_AGENT_API_KEY\` | Shared secret sent as \`X-Internal-Key\` header | \`""\` |
+| \`AI_TOP_K\` | Retrieval top-K for RAG context | \`5\` |
+| \`AI_MESSAGE_MAX_LENGTH\` | Max user message length (characters) | \`2000\` |
+| \`AI_MESSAGE_MIN_LENGTH\` | Min user message length (characters) | \`3\` |
+| \`AI_HISTORY_MESSAGES\` | Last N messages sent to the LLM as context | \`6\` |
+| \`AI_RATE_LIMIT_PER_HOUR\` | Messages per admin per hour (Redis fixed window) | \`30\` |
+| \`AI_AGENT_TIMEOUT_MS\` | Upstream SSE request timeout | \`60000\` |
+
 ### Periodic maintenance (scheduler)
 
 | Variable | Purpose | Default |
 |---|---|---|
 | \`MAINTENANCE_TICK_MS\` | Scheduler tick interval | \`5000\` |
 | \`MAINTENANCE_LOCK_TTL_SEC\` | Redis lock TTL if a runner dies mid-job | \`300\` |
-| \`MAINTENANCE_KEY_PREFIX\` | Redis prefix for last-run timestamps and locks | \`ninjasset:sched:\` |
 | \`TOKEN_CLEANUP_INTERVAL_MS\` | Expired session/token cleanup cadence | \`21600000\` (6 h) |
 | \`API_RETENTION_PURGE_INTERVAL_MS\` | API access log purge cadence | \`21600000\` (6 h) |
 | \`IMPORT_ARTIFACT_PURGE_INTERVAL_MS\` | Import artifact purge cadence | \`21600000\` (6 h) |
 
-> **Production:** Change JWT secrets, database passwords, and \`API_KEY_PREFIX\` (\`nsk_live_\` vs \`nsk_test_\`). Never set \`MOCK_CAPTCHA\`, \`MOCK_EMAIL\`, or \`WEBHOOK_ALLOW_INSECURE_TARGETS\` in production.
+> **Production:** Change JWT secrets, database passwords, and \`API_KEY_PREFIX\` (\`nsk_live_\` vs \`nsk_test_\`). Never set \`MOCK_CAPTCHA\`, \`MOCK_EMAIL\`, \`MOCK_AI\`, or \`WEBHOOK_ALLOW_INSECURE_TARGETS\` in production.
 `,
   },
 
