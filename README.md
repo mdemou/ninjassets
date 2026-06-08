@@ -37,12 +37,10 @@ To refresh these images after UI changes, start the app on port 3000 (with `AI_A
 
 - [Screenshots](#screenshots)
 - [Features](#features)
-- [Architecture](#architecture)
 - [Tech stack](#tech-stack)
 - [Prerequisites](#prerequisites)
 - [Quick start](#quick-start)
 - [Docker Compose](#docker-compose)
-- [Development](#development)
 - [Testing](#testing)
 - [Documentation](#documentation)
 - [Project layout](#project-layout)
@@ -67,41 +65,6 @@ To refresh these images after UI changes, start the app on port 3000 (with `AI_A
 - **Public landing & docs** — Marketing page at `/` (no API calls, no login/signup links); in-app docs at `/docs`; authentication at `/login` and `/register`. [Landing](docs/spec-public-landing.md) · [Auth](docs/spec-authentication.md)
 - **Auth & profile** — Registration, email verification, password reset, lockout, settings, EN/ES UI. Admins can set another user's password from the user directory. [Auth](docs/spec-authentication.md) · [Profile](docs/spec-profile-settings.md) · [Users](docs/spec-admin-user-management.md)
 
-## Architecture
-
-```mermaid
-flowchart LR
-  subgraph client [Browser]
-    SPA[React Router SPA :3000]
-  end
-  subgraph api [Backend]
-    Hapi[Hapi API :3001]
-  end
-  subgraph ai [AI optional]
-    AG[aiagent FastAPI :8000]
-    QD[(Qdrant)]
-  end
-  subgraph infra [Docker Compose]
-    PG[(PostgreSQL 16)]
-    RD[(Redis 7)]
-  end
-  subgraph jobs [Background]
-    SCH[Redis-backed scheduler]
-    Q[Notification + import/export queues]
-  end
-  SPA -->|"/api proxy"| Hapi
-  Hapi --> PG
-  Hapi --> RD
-  Hapi --> SCH
-  Hapi --> Q
-  Hapi -.->|AI_ASSISTANT_ENABLED| AG
-  AG --> QD
-  SCH --> RD
-  Q --> RD
-```
-
-Admin routes use `/api/p/*`; personal routes use `/api/me/*` (see [platform access model](docs/spec-platform-access-model.md)).
-
 ## Tech stack
 
 | Layer                | Technologies                                                                                                                                                                                  |
@@ -114,75 +77,50 @@ Admin routes use `/api/p/*`; personal routes use `/api/me/*` (see [platform acce
 
 ## Prerequisites
 
-- **Node.js** 20+
-- **npm**
-- **Docker** (recommended for PostgreSQL and Redis)
+- **Docker** and Docker Compose
 
 ## Quick start
 
-Local development with hot reload (API and web app run on the host; only PostgreSQL and Redis run in Docker).
-
-1. Copy environment defaults and start infrastructure:
-
-```bash
-cp backend/.env.example backend/.env
-docker compose --env-file backend/.env up -d postgres redis-server qdrant
-```
-
-Redis backs webhooks, email jobs, the periodic maintenance scheduler, and optional import/export job wakeups. Qdrant is only needed when running the AI assistant locally (see [aiagent/README.md](aiagent/README.md)).
-
-2. Run the API (from a new terminal):
-
-```bash
-cd backend
-npm install
-npm run migrate
-npm run dev
-```
-
-API: **[http://localhost:3001](http://localhost:3001)**
-
-3. Run the web app:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-App: **[http://localhost:3000](http://localhost:3000)**
-
-Optional seed data: `cd backend && npm run seed` (append-only). For a full reset plus richer demo data: `npm run seed:demo`.
-
-## Docker Compose
-
-Run the full stack from published images: PostgreSQL, Redis, Qdrant, **aiagent** (AI RAG service), backend API, and nginx frontend.
-
-| Service | Image | Notes |
-| --- | --- | --- |
-| `postgres`, `redis-server` | Official images | Same as local dev |
-| `qdrant` | `qdrant/qdrant` | Vector store for the assistant |
-| `aiagent` | `ghcr.io/<owner>/ninjasset-aiagent` | ~2 GB image (deps only); embedding model via volume |
-| `backend`, `frontend` | `ghcr.io/<owner>/ninjasset-{backend,frontend}` | API + SPA |
-
-1. Create env files:
+1. Copy the example env files (backend **and** aiagent) and edit values as needed:
 
 ```bash
 cp backend/.env.example backend/.env
 cp aiagent/.env.example aiagent/.env
 ```
 
-Edit `backend/.env` before starting. At minimum, set strong values for `JWT_ADMIN_SECRET_KEY` and `JWT_USER_SECRET_KEY`. Keep `REDIS_PASSWORD` in sync with the password configured for the `redis-server` service in `docker-compose.yml` (default `your_secure_password`).
+At minimum, set strong `JWT_ADMIN_SECRET_KEY` and `JWT_USER_SECRET_KEY` in `backend/.env`. Keep `REDIS_PASSWORD` in sync with `docker-compose.yml` (default `your_secure_password`). For the AI assistant, set `AI_ASSISTANT_ENABLED=true`, `GROK_API_KEY`, and matching `AI_AGENT_API_KEY` in both env files — see [Docker Compose](#docker-compose) for details.
 
-For the AI assistant, set in `backend/.env`:
+2. Start the stack:
 
-- `AI_ASSISTANT_ENABLED=true`
-- `AI_AGENT_API_KEY` — shared secret (same value in `aiagent/.env`)
+```bash
+docker compose -f docker-compose.yml up
+```
 
-Set in `aiagent/.env`:
+- **App:** [http://localhost:3000](http://localhost:3000)
+- **API (direct):** [http://localhost:3001](http://localhost:3001)
 
-- `GROK_API_KEY` — LLM provider key
-- `AI_AGENT_API_KEY` — must match the backend
+The backend image runs migrations on startup. Add `-d` to run detached.
+
+3. If you enabled the AI assistant, populate Qdrant from this repo checkout (once, or after editing specs/docs/API):
+
+```bash
+cd aiagent
+uv sync
+uv run python -m ai_service.jobs.reindex
+```
+
+`aiagent/.env` should use `QDRANT_URL=http://localhost:6333` (the default in `.env.example`). Details: [aiagent/README.md — Reindex](aiagent/README.md#reindex).
+
+## Docker Compose
+
+Full stack from published images: PostgreSQL, Redis, Qdrant, **aiagent** (AI RAG service), backend API, and nginx frontend.
+
+| Service | Image | Notes |
+| --- | --- | --- |
+| `postgres`, `redis-server` | Official images | Data store and job queues |
+| `qdrant` | `qdrant/qdrant` | Vector store for the assistant |
+| `aiagent` | `ghcr.io/<owner>/ninjasset-aiagent` | ~2 GB image (deps only); embedding model via volume |
+| `backend`, `frontend` | `ghcr.io/<owner>/ninjasset-{backend,frontend}` | API + SPA |
 
 Compose overrides container networking — you do **not** need to set these manually in `backend/.env`:
 
@@ -194,71 +132,28 @@ Compose overrides container networking — you do **not** need to set these manu
 | `AI_AGENT_URL` | `http://aiagent:8000` |
 | `QDRANT_URL` (aiagent) | `http://qdrant:6333` |
 
-**Embedding model volume:** the aiagent image does not include the ~1.1 GB Hugging Face weights. By default, Compose bind-mounts your host cache:
+**Embedding model volume:** the aiagent image does not include the ~1.1 GB Hugging Face weights (`intfloat/multilingual-e5-base`). Compose bind-mounts a host cache into the container (`HF_HOME=/models/hf`); default host path is `~/.cache/huggingface`. Override with `HF_CACHE_DIR` in a root `.env` file.
 
-```env
-# optional — defaults to ~/.cache/huggingface
-HF_CACHE_DIR=/Users/you/.cache/huggingface
-```
-
-First aiagent start with an empty cache downloads the model (several minutes; healthcheck allows up to 5 minutes).
-
-2. Pull images and start all services:
+Pre-download on the host (optional — same path the container uses, faster first start):
 
 ```bash
-docker compose --env-file backend/.env pull
-docker compose --env-file backend/.env up -d
+cd aiagent
+uv sync
+uv run python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
 ```
 
-- **App:** [http://localhost:3000](http://localhost:3000) — nginx serves the SPA and proxies `/api/` to the backend
-- **API (direct):** [http://localhost:3001](http://localhost:3001)
-- **aiagent (internal):** [http://localhost:8000](http://localhost:8000) — backend proxy only; do not expose publicly in production
+If the cache directory is missing or empty, `entrypoint.sh` downloads the model on first container start (several minutes; healthcheck `start_period` allows up to 5 minutes). Later starts reuse the mounted cache.
 
-The backend image runs Knex migrations on startup. Named volumes persist PostgreSQL data, Qdrant vectors, backend uploads, and (optionally) the HF cache if you switch from a bind mount to a named volume.
+Named volumes persist PostgreSQL data, Qdrant vectors, and backend uploads.
 
-3. After a new release (version tag on GitHub), refresh images:
+After a new release (version tag on GitHub), refresh images:
 
 ```bash
-docker compose --env-file backend/.env pull
-docker compose --env-file backend/.env up -d
+docker compose -f docker-compose.yml pull
+docker compose -f docker-compose.yml up -d
 ```
 
 Images (`ninjasset-backend`, `ninjasset-frontend`, `ninjasset-aiagent`) are published to GitHub Container Registry on version tags (`v*`). If the packages are private, log in first: `docker login ghcr.io`.
-
-To run only infrastructure while developing on the host, use [Quick start](#quick-start) (`docker compose --env-file backend/.env up -d postgres redis-server qdrant`).
-
-## Development
-
-Environment variables are split per service:
-
-| File | Purpose |
-| --- | --- |
-| `backend/.env` | API, Knex migrations, Docker Compose (`--env-file backend/.env`) |
-| `aiagent/.env` | AI service (Qdrant, embeddings, LLM, PII anonymization) — see [aiagent/README.md](aiagent/README.md) |
-| `e2e/.env` | Playwright tests (PostgreSQL + Redis connection only) |
-| `frontend/.env` | Optional dev-server overrides (`PORT`, `API_URL`) |
-
-| Variable                                                                                                   | Purpose                                                                                                    |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL` / `DB_*`                                                                                    | PostgreSQL connection                                                                                      |
-| `JWT_ADMIN_SECRET_KEY`, `JWT_USER_SECRET_KEY`                                                              | Auth tokens                                                                                                |
-| `FRONTEND_URL`                                                                                             | Links in emails (handovers, verification)                                                                  |
-| `REDIS_*`                                                                                                  | Webhooks, email, import/export queue, scheduler state (last-run timestamps + locks)                        |
-| `MAINTENANCE_*`, `TOKEN_CLEANUP_*`, `API_RETENTION_*`, `IMPORT_ARTIFACT_PURGE_*`, `IMPORT_SAFETY_SWEEP_MS` | Periodic maintenance cadences ([health/ops spec](docs/spec-health-operations.md))                          |
-| `IMPORT_*`, `IMPORT_EXPORT_*`                                                                              | Bulk import/export limits, storage, worker, optional completion email ([spec](docs/spec-import-export.md)) |
-| `WEBHOOK_ALERT_SCAN_INTERVAL_MS`                                                                           | How often the API scans for new data-quality issues to emit `alert.raised` webhook events                  |
-| `SIGNUP_ENABLED`                                                                                           | When `false`, disables registration API and UI (`GET /api/session/public-config`)                          |
-| `MOCK_CAPTCHA`, `MOCK_EMAIL`                                                                               | Simpler local testing (log mail to console when `SMTP_HOST` is empty)                                      |
-| `HANDOVER_TOKEN_EXPIRY_HOURS`                                                                              | Magic-link TTL (default 72)                                                                                |
-| `AI_ASSISTANT_ENABLED`, `MOCK_AI`, `AI_AGENT_URL`, `AI_AGENT_API_KEY`                                      | Admin AI assistant feature flag, E2E mock, and aiagent proxy ([spec](docs/spec-ai-assistant.md))           |
-
-Layer-specific guides:
-
-- [Backend README](backend/README.md) — API structure, migrations, layering, background jobs
-- [Frontend README](frontend/README.md) — SPA routes, providers, components
-- [aiagent README](aiagent/README.md) — RAG service, Qdrant corpus, reindex, local run
-
-Production-style runs: `npm run build && npm start` in each package after setting `NODE_ENV` and production secrets.
 
 ## Testing
 

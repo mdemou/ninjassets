@@ -98,15 +98,46 @@ elsewhere.
 
 ## Reindex
 
-Full wipe & recreate (§8.4). Run after editing specs/docs/the API:
+The assistant needs an indexed corpus in Qdrant before it can answer. Indexing is a **full
+wipe & recreate** (§8.4) — run on first setup and again after editing specs, in-app docs, or
+the HTTP API.
+
+Sources are resolved relative to `CORPUS_ROOT` (default `..`, the repo root):
+`docs/spec-*.md`, `frontend/app/data/docs-pages.ts`, and `docs/openapi.json`.
+
+### CLI (recommended)
+
+From `aiagent/` with [uv](https://docs.astral.sh/uv/) installed:
 
 ```bash
+uv sync
 uv run python -m ai_service.jobs.reindex
 ```
 
-Sources are resolved relative to `CORPUS_ROOT` (default `..`, the repo root):
-`docs/spec-*.md`, `frontend/app/data/docs-pages.ts`, and `docs/openapi.json`. On startup,
-if `AI_AUTO_INDEX_ON_START=true` and the collection is empty, it self-populates.
+- **Local aiagent** — `QDRANT_URL=http://localhost:6333` in `.env` (default); start Qdrant with
+  `docker compose -f docker-compose.yml up -d qdrant` from the repo root.
+- **Full Docker Compose stack** — same command from your host checkout. The published aiagent
+  image does not bundle the corpus, so indexing always runs against the repo on disk while
+  Qdrant is reachable on `localhost:6333`.
+
+First run downloads the embedding model (~1.1 GB) unless it is already cached under `HF_HOME`.
+
+### HTTP (optional)
+
+When aiagent runs locally with corpus access (`uv run uvicorn …`), you can trigger the same job:
+
+```bash
+curl -X POST http://localhost:8000/knowledge/reindex \
+  -H "X-Internal-Key: ${AI_AGENT_API_KEY}"
+```
+
+(Omit the header when `AI_AGENT_API_KEY` is empty in dev.)
+
+### Auto-index on startup
+
+Set `AI_AUTO_INDEX_ON_START=true` in `aiagent/.env` to index automatically when the collection
+is empty. The corpus paths under `CORPUS_ROOT` must exist inside the running process — works for
+local `uvicorn`, not for the default Compose aiagent container (use the CLI above instead).
 
 **OpenAPI is a static file**, generated offline from the backend (no running server, no
 DB connection — it builds the hapi app in memory and dumps hapi-swagger's `/docs.json`):

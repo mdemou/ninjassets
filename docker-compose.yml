@@ -72,7 +72,16 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Host HF cache → container HF_HOME (set HF_CACHE_DIR in .env to override).
+      # Embedding weights (~1.1 GB, intfloat/multilingual-e5-base) are NOT in the image.
+      # Bind-mount a host Hugging Face cache → container HF_HOME (/models/hf).
+      # Default host path: ~/.cache/huggingface. Override with HF_CACHE_DIR in a root .env.
+      #
+      # Pre-download on the host (optional — reuses the same path the container mounts):
+      #   cd aiagent && uv sync && uv run python -c \
+      #     "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
+      #
+      # If the host path is missing, Docker creates an empty directory. entrypoint.sh then
+      # downloads the model on first container start (several minutes; healthcheck allows 5 min).
       - ${HF_CACHE_DIR:-${HOME}/.cache/huggingface}:/models/hf
     depends_on:
       qdrant:
