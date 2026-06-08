@@ -366,7 +366,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model45"
+              "$ref": "#/definitions/Model47"
             }
           }
         ],
@@ -541,7 +541,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model47"
+              "$ref": "#/definitions/Model49"
             }
           }
         ],
@@ -646,7 +646,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model52"
+              "$ref": "#/definitions/Model54"
             }
           }
         ],
@@ -726,7 +726,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model54"
+              "$ref": "#/definitions/Model56"
             }
           }
         ],
@@ -928,7 +928,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model56"
+              "$ref": "#/definitions/Model58"
             }
           }
         ],
@@ -1021,7 +1021,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model57"
+              "$ref": "#/definitions/Model59"
             }
           }
         ],
@@ -1126,7 +1126,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model60"
+              "$ref": "#/definitions/Model62"
             }
           }
         ],
@@ -1276,7 +1276,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model62"
+              "$ref": "#/definitions/Model64"
             }
           }
         ],
@@ -1381,7 +1381,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model63"
+              "$ref": "#/definitions/Model65"
             }
           }
         ],
@@ -1552,6 +1552,38 @@
               "$ref": "#/definitions/previewHandoverInternalError"
             },
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/p/ai/conversations": {
+      "get": {
+        "summary": "List the current admin's AI conversations",
+        "operationId": "getApiPAiConversations",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "tags": [
+          "admin",
+          "ai"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/aiListConversationsResponse"
+            },
+            "description": "Conversations retrieved successfully"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/aiListConversationsUnauthorized"
+            },
+            "description": "Unauthorized"
           }
         }
       }
@@ -1760,75 +1792,6 @@
           }
         }
       },
-      "patch": {
-        "summary": "Update an asset (admin only)",
-        "operationId": "patchApiPAssetsId",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model94"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateAssetResponse"
-            },
-            "description": "Asset updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateAssetBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/updateAssetUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/updateAssetNotFound"
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "schema": {
-              "$ref": "#/definitions/updateAssetConflict"
-            },
-            "description": "Conflict"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/updateAssetInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      },
       "delete": {
         "summary": "Delete an asset (admin only)",
         "operationId": "deleteApiPAssetsId",
@@ -1874,6 +1837,75 @@
           "500": {
             "schema": {
               "$ref": "#/definitions/deleteAssetInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update an asset (admin only)",
+        "operationId": "patchApiPAssetsId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model100"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateAssetResponse"
+            },
+            "description": "Asset updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateAssetBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/updateAssetUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/updateAssetNotFound"
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "schema": {
+              "$ref": "#/definitions/updateAssetConflict"
+            },
+            "description": "Conflict"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/updateAssetInternalError"
             },
             "description": "Internal server error"
           }
@@ -1931,75 +1963,6 @@
           }
         }
       },
-      "patch": {
-        "summary": "Update a category (admin only)",
-        "operationId": "patchApiPCategoriesId",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model97"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateCategoryResponse"
-            },
-            "description": "Category updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateCategoryBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/updateCategoryUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/updateCategoryNotFound"
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "schema": {
-              "$ref": "#/definitions/updateCategoryConflict"
-            },
-            "description": "Conflict"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/updateCategoryInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      },
       "delete": {
         "summary": "Delete a category (admin only)",
         "operationId": "deleteApiPCategoriesId",
@@ -2051,6 +2014,75 @@
           "500": {
             "schema": {
               "$ref": "#/definitions/deleteCategoryInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a category (admin only)",
+        "operationId": "patchApiPCategoriesId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model103"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateCategoryResponse"
+            },
+            "description": "Category updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateCategoryBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/updateCategoryUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/updateCategoryNotFound"
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "schema": {
+              "$ref": "#/definitions/updateCategoryConflict"
+            },
+            "description": "Conflict"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/updateCategoryInternalError"
             },
             "description": "Internal server error"
           }
@@ -2312,75 +2344,6 @@
           }
         }
       },
-      "patch": {
-        "summary": "Update a manufacturer (admin only)",
-        "operationId": "patchApiPManufacturersId",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model99"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateManufacturerResponse"
-            },
-            "description": "Manufacturer updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateManufacturerBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/updateManufacturerUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/updateManufacturerNotFound"
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "schema": {
-              "$ref": "#/definitions/updateManufacturerConflict"
-            },
-            "description": "Conflict"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/updateManufacturerInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      },
       "delete": {
         "summary": "Delete a manufacturer (admin only)",
         "operationId": "deleteApiPManufacturersId",
@@ -2432,6 +2395,75 @@
           "500": {
             "schema": {
               "$ref": "#/definitions/deleteManufacturerInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a manufacturer (admin only)",
+        "operationId": "patchApiPManufacturersId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model105"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateManufacturerResponse"
+            },
+            "description": "Manufacturer updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateManufacturerBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/updateManufacturerUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/updateManufacturerNotFound"
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "schema": {
+              "$ref": "#/definitions/updateManufacturerConflict"
+            },
+            "description": "Conflict"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/updateManufacturerInternalError"
             },
             "description": "Internal server error"
           }
@@ -2554,69 +2586,6 @@
           }
         }
       },
-      "patch": {
-        "summary": "Update a site (admin only)",
-        "operationId": "patchApiPSitesId",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model101"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateSiteResponse"
-            },
-            "description": "Site updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateSiteBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/updateSiteUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/updateSiteNotFound"
-            },
-            "description": "Not Found"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/updateSiteInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      },
       "delete": {
         "summary": "Delete a site (admin only). Pass ?deleteAssets=true to also delete linked assets",
         "operationId": "deleteApiPSitesId",
@@ -2668,6 +2637,69 @@
           "500": {
             "schema": {
               "$ref": "#/definitions/deleteSiteInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a site (admin only)",
+        "operationId": "patchApiPSitesId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model107"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateSiteResponse"
+            },
+            "description": "Site updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateSiteBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/updateSiteUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/updateSiteNotFound"
+            },
+            "description": "Not Found"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/updateSiteInternalError"
             },
             "description": "Internal server error"
           }
@@ -2762,75 +2794,6 @@
           }
         }
       },
-      "patch": {
-        "summary": "Update a user (admin only)",
-        "operationId": "patchApiPUsersId",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model104"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateUserResponse"
-            },
-            "description": "User updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateUserBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/updateUserUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/updateUserNotFound"
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "schema": {
-              "$ref": "#/definitions/updateUserConflict"
-            },
-            "description": "Conflict"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/updateUserInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      },
       "delete": {
         "summary": "Delete a user (admin only)",
         "operationId": "deleteApiPUsersId",
@@ -2876,6 +2839,75 @@
           "500": {
             "schema": {
               "$ref": "#/definitions/deleteUserInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a user (admin only)",
+        "operationId": "patchApiPUsersId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model110"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateUserResponse"
+            },
+            "description": "User updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateUserBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/updateUserUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/updateUserNotFound"
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "schema": {
+              "$ref": "#/definitions/updateUserConflict"
+            },
+            "description": "Conflict"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/updateUserInternalError"
             },
             "description": "Internal server error"
           }
@@ -2928,75 +2960,6 @@
           "500": {
             "schema": {
               "$ref": "#/definitions/getVendorDetailsInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update a vendor (admin only)",
-        "operationId": "patchApiPVendorsId",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model105"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateVendorResponse"
-            },
-            "description": "Vendor updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateVendorBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/updateVendorUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/updateVendorNotFound"
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "schema": {
-              "$ref": "#/definitions/updateVendorConflict"
-            },
-            "description": "Conflict"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/updateVendorInternalError"
             },
             "description": "Internal server error"
           }
@@ -3057,6 +3020,75 @@
             "description": "Internal server error"
           }
         }
+      },
+      "patch": {
+        "summary": "Update a vendor (admin only)",
+        "operationId": "patchApiPVendorsId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model111"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateVendorResponse"
+            },
+            "description": "Vendor updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateVendorBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/updateVendorUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/updateVendorNotFound"
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "schema": {
+              "$ref": "#/definitions/updateVendorConflict"
+            },
+            "description": "Conflict"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/updateVendorInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
       }
     },
     "/api/p/webhooks/destinations": {
@@ -3110,7 +3142,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model79"
+              "$ref": "#/definitions/Model82"
             }
           }
         ],
@@ -3288,6 +3320,98 @@
         }
       }
     },
+    "/api/p/ai/conversations/{id}": {
+      "get": {
+        "summary": "Get an AI conversation with its messages (owner only)",
+        "operationId": "getApiPAiConversationsId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "tags": [
+          "admin",
+          "ai"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/aiGetConversationResponse"
+            },
+            "description": "Conversation retrieved successfully"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/aiGetConversationUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/aiGetConversationNotFound"
+            },
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete one of the current admin's AI conversations",
+        "operationId": "deleteApiPAiConversationsId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "tags": [
+          "admin",
+          "ai"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/aiDeleteConversationResponse"
+            },
+            "description": "Conversation deleted successfully"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/aiDeleteConversationUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/aiDeleteConversationNotFound"
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/p/assets/{assetId}/handovers": {
       "get": {
         "summary": "List recent handovers for an asset (admin only)",
@@ -3362,7 +3486,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model84"
+              "$ref": "#/definitions/Model87"
             }
           }
         ],
@@ -4357,70 +4481,6 @@
           }
         }
       },
-      "patch": {
-        "summary": "Update a webhook destination (admin only)",
-        "operationId": "patchApiPWebhooksDestinationsId",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model109"
-            }
-          }
-        ],
-        "tags": [
-          "admin",
-          "webhooks"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateWebhookDestinationResponse"
-            },
-            "description": "Webhook destination updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateWebhookDestinationBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/updateWebhookDestinationUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/updateWebhookDestinationNotFound"
-            },
-            "description": "Not Found"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/updateWebhookDestinationInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      },
       "delete": {
         "summary": "Delete a webhook destination (admin only)",
         "operationId": "deleteApiPWebhooksDestinationsId",
@@ -4467,6 +4527,70 @@
           "500": {
             "schema": {
               "$ref": "#/definitions/deleteWebhookDestinationInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a webhook destination (admin only)",
+        "operationId": "patchApiPWebhooksDestinationsId",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model115"
+            }
+          }
+        ],
+        "tags": [
+          "admin",
+          "webhooks"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateWebhookDestinationResponse"
+            },
+            "description": "Webhook destination updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateWebhookDestinationBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/updateWebhookDestinationUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/updateWebhookDestinationNotFound"
+            },
+            "description": "Not Found"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/updateWebhookDestinationInternalError"
             },
             "description": "Internal server error"
           }
@@ -4700,7 +4824,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model66"
+              "$ref": "#/definitions/Model68"
             }
           }
         ],
@@ -4726,7 +4850,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model67"
+              "$ref": "#/definitions/Model69"
             }
           }
         ],
@@ -4764,7 +4888,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model70"
+              "$ref": "#/definitions/Model72"
             }
           }
         ],
@@ -4808,7 +4932,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model71"
+              "$ref": "#/definitions/Model73"
             }
           }
         ],
@@ -4834,7 +4958,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model72"
+              "$ref": "#/definitions/Model74"
             }
           }
         ],
@@ -4866,7 +4990,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model73"
+              "$ref": "#/definitions/Model75"
             }
           }
         ],
@@ -4970,7 +5094,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model74"
+              "$ref": "#/definitions/Model76"
             }
           }
         ],
@@ -5017,6 +5141,69 @@
         }
       }
     },
+    "/api/p/ai/chat": {
+      "post": {
+        "summary": "Send a message to the AI assistant; streaming (SSE) RAG reply (admin only)",
+        "operationId": "postApiPAiChat",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model79"
+            }
+          }
+        ],
+        "tags": [
+          "admin",
+          "ai"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/aiChatResponse"
+            },
+            "description": "Streaming RAG response (SSE)"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/aiChatBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/aiChatUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "schema": {
+              "$ref": "#/definitions/aiChatForbidden"
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "schema": {
+              "$ref": "#/definitions/aiChatConflict"
+            },
+            "description": "Conflict"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/aiChatInternalError"
+            },
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/p/asset-assignments/bulk": {
       "post": {
         "summary": "Bulk assign or return multiple assets for a user (admin only)",
@@ -5032,7 +5219,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model77"
+              "$ref": "#/definitions/Model80"
             }
           }
         ],
@@ -5086,7 +5273,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model78"
+              "$ref": "#/definitions/Model81"
             }
           }
         ],
@@ -5483,7 +5670,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model89"
+              "$ref": "#/definitions/Model92"
             }
           }
         ],
@@ -5537,7 +5724,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model112"
+              "$ref": "#/definitions/Model96"
             }
           }
         ],
@@ -5796,7 +5983,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model91"
+              "$ref": "#/definitions/Model94"
             }
           }
         ],
@@ -5890,194 +6077,6 @@
         }
       }
     },
-    "/api/session/change-password": {
-      "patch": {
-        "summary": "Change password",
-        "operationId": "patchApiSessionChangepassword",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model92"
-            }
-          }
-        ],
-        "tags": [
-          "users"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/changePasswordResponse"
-            },
-            "description": "Password changed successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/changePasswordBadRequest"
-            },
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/api/user/profile": {
-      "patch": {
-        "summary": "Update user profile",
-        "operationId": "patchApiUserProfile",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model93"
-            }
-          }
-        ],
-        "tags": [
-          "users"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/updateProfileResponse"
-            },
-            "description": "Profile updated successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/updateProfileBadRequest"
-            },
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/api/p/import-jobs/{id}/mapping": {
-      "patch": {
-        "summary": "Set column mapping + options for an import job",
-        "operationId": "patchApiPImportjobsIdMapping",
-        "parameters": [
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model107"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/setMappingResponse"
-            },
-            "description": "Mapping saved"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/setMappingBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/setMappingUnauthorized"
-            },
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/p/users/{id}/password": {
-      "patch": {
-        "summary": "Change a user's password (admin only)",
-        "operationId": "patchApiPUsersIdPassword",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "authorization",
-            "in": "header",
-            "required": true
-          },
-          {
-            "type": "string",
-            "x-format": {
-              "guid": true
-            },
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/Model108"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/changeUserPasswordResponse"
-            },
-            "description": "Password changed successfully"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/changeUserPasswordBadRequest"
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "schema": {
-              "$ref": "#/definitions/changeUserPasswordUnauthorized"
-            },
-            "description": "Unauthorized"
-          },
-          "404": {
-            "schema": {
-              "$ref": "#/definitions/changeUserPasswordNotFound"
-            },
-            "description": "Not Found"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/changeUserPasswordInternalError"
-            },
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/api/user/account": {
       "delete": {
         "summary": "Delete user account",
@@ -6093,7 +6092,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Model111"
+              "$ref": "#/definitions/Model95"
             }
           }
         ],
@@ -6146,6 +6145,194 @@
               "$ref": "#/definitions/deletePresetUnauthorized"
             },
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/session/change-password": {
+      "patch": {
+        "summary": "Change password",
+        "operationId": "patchApiSessionChangepassword",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model98"
+            }
+          }
+        ],
+        "tags": [
+          "users"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/changePasswordResponse"
+            },
+            "description": "Password changed successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/changePasswordBadRequest"
+            },
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/user/profile": {
+      "patch": {
+        "summary": "Update user profile",
+        "operationId": "patchApiUserProfile",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model99"
+            }
+          }
+        ],
+        "tags": [
+          "users"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/updateProfileResponse"
+            },
+            "description": "Profile updated successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/updateProfileBadRequest"
+            },
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/p/import-jobs/{id}/mapping": {
+      "patch": {
+        "summary": "Set column mapping + options for an import job",
+        "operationId": "patchApiPImportjobsIdMapping",
+        "parameters": [
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model113"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/setMappingResponse"
+            },
+            "description": "Mapping saved"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/setMappingBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/setMappingUnauthorized"
+            },
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/p/users/{id}/password": {
+      "patch": {
+        "summary": "Change a user's password (admin only)",
+        "operationId": "patchApiPUsersIdPassword",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-format": {
+              "guid": true
+            },
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Model114"
+            }
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/changeUserPasswordResponse"
+            },
+            "description": "Password changed successfully"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/changeUserPasswordBadRequest"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/changeUserPasswordUnauthorized"
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "schema": {
+              "$ref": "#/definitions/changeUserPasswordNotFound"
+            },
+            "description": "Not Found"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/changeUserPasswordInternalError"
+            },
+            "description": "Internal server error"
           }
         }
       }
@@ -8424,6 +8611,10 @@
         "signupEnabled": {
           "type": "boolean",
           "example": true
+        },
+        "aiEnabled": {
+          "type": "boolean",
+          "example": false
         }
       }
     },
@@ -8589,7 +8780,81 @@
         }
       }
     },
+    "AiConversation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "conversations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AiConversation"
+      }
+    },
     "Model25": {
+      "type": "object",
+      "properties": {
+        "conversations": {
+          "$ref": "#/definitions/conversations"
+        },
+        "total": {
+          "type": "number"
+        }
+      }
+    },
+    "aiListConversationsResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "AI2001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Conversations retrieved successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model25"
+        }
+      }
+    },
+    "aiListConversationsUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "Model26": {
       "type": "object",
       "properties": {
         "apiKey": {
@@ -8613,7 +8878,7 @@
           "example": "API key retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model25"
+          "$ref": "#/definitions/Model26"
         }
       }
     },
@@ -8668,7 +8933,7 @@
         }
       }
     },
-    "Model26": {
+    "Model27": {
       "type": "object",
       "properties": {
         "id": {
@@ -8701,10 +8966,10 @@
     "markers": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Model26"
+        "$ref": "#/definitions/Model27"
       }
     },
-    "Model27": {
+    "Model28": {
       "type": "object",
       "properties": {
         "markers": {
@@ -8728,7 +8993,7 @@
           "example": "Asset map markers retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model27"
+          "$ref": "#/definitions/Model28"
         }
       }
     },
@@ -8766,7 +9031,7 @@
         }
       }
     },
-    "Model28": {
+    "Model29": {
       "type": "object",
       "properties": {
         "asset": {
@@ -8790,7 +9055,7 @@
           "example": "Asset details retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model28"
+          "$ref": "#/definitions/Model29"
         }
       }
     },
@@ -8862,7 +9127,7 @@
         }
       }
     },
-    "Model29": {
+    "Model30": {
       "type": "object",
       "properties": {
         "category": {
@@ -8886,7 +9151,7 @@
           "example": "Category details retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model29"
+          "$ref": "#/definitions/Model30"
         }
       }
     },
@@ -8975,7 +9240,7 @@
         }
       }
     },
-    "Model30": {
+    "Model31": {
       "type": "object",
       "properties": {
         "handover": {
@@ -8999,7 +9264,7 @@
           "example": "Handover retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model30"
+          "$ref": "#/definitions/Model31"
         }
       }
     },
@@ -9079,7 +9344,7 @@
         "JSON"
       ]
     },
-    "Model31": {
+    "Model32": {
       "type": "object",
       "properties": {
         "kind": {
@@ -9124,10 +9389,10 @@
     "items": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Model31"
+        "$ref": "#/definitions/Model32"
       }
     },
-    "Model32": {
+    "Model33": {
       "type": "object",
       "properties": {
         "items": {
@@ -9160,7 +9425,7 @@
           "example": "Import/export history retrieved"
         },
         "data": {
-          "$ref": "#/definitions/Model32"
+          "$ref": "#/definitions/Model33"
         }
       }
     },
@@ -9249,7 +9514,7 @@
         }
       }
     },
-    "Model33": {
+    "Model34": {
       "type": "object",
       "properties": {
         "manufacturer": {
@@ -9273,7 +9538,7 @@
           "example": "Manufacturer details retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model33"
+          "$ref": "#/definitions/Model34"
         }
       }
     },
@@ -9328,7 +9593,7 @@
         }
       }
     },
-    "Model34": {
+    "Model35": {
       "type": "object",
       "properties": {
         "issue": {
@@ -9384,10 +9649,10 @@
     "rows": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Model34"
+        "$ref": "#/definitions/Model35"
       }
     },
-    "Model35": {
+    "Model36": {
       "type": "object",
       "properties": {
         "rows": {
@@ -9420,7 +9685,7 @@
           "example": "Data quality report retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model35"
+          "$ref": "#/definitions/Model36"
         }
       }
     },
@@ -9458,7 +9723,7 @@
         }
       }
     },
-    "Model36": {
+    "Model37": {
       "type": "object",
       "properties": {
         "site": {
@@ -9482,7 +9747,7 @@
           "example": "Site details retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model36"
+          "$ref": "#/definitions/Model37"
         }
       }
     },
@@ -9554,7 +9819,7 @@
         }
       }
     },
-    "Model37": {
+    "Model38": {
       "type": "object",
       "properties": {
         "status": {
@@ -9568,10 +9833,10 @@
     "assetsByStatus": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Model37"
+        "$ref": "#/definitions/Model38"
       }
     },
-    "Model38": {
+    "Model39": {
       "type": "object",
       "properties": {
         "siteId": {
@@ -9591,7 +9856,7 @@
     "assetsBySite": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Model38"
+        "$ref": "#/definitions/Model39"
       }
     },
     "attention": {
@@ -9770,7 +10035,7 @@
         }
       }
     },
-    "Model39": {
+    "Model40": {
       "type": "object",
       "properties": {
         "vendor": {
@@ -9794,7 +10059,7 @@
           "example": "Vendor details retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model39"
+          "$ref": "#/definitions/Model40"
         }
       }
     },
@@ -9904,7 +10169,7 @@
         "$ref": "#/definitions/WebhookDestination"
       }
     },
-    "Model40": {
+    "Model41": {
       "type": "object",
       "properties": {
         "destinations": {
@@ -9931,7 +10196,7 @@
           "example": "Webhook destinations retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model40"
+          "$ref": "#/definitions/Model41"
         }
       }
     },
@@ -9995,7 +10260,7 @@
         "$ref": "#/definitions/WebhookEvent"
       }
     },
-    "Model41": {
+    "Model42": {
       "type": "object",
       "properties": {
         "events": {
@@ -10019,7 +10284,7 @@
           "example": "Event catalog retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model41"
+          "$ref": "#/definitions/Model42"
         }
       }
     },
@@ -10176,17 +10441,151 @@
         }
       }
     },
-    "Model42": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "assistant"
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "enum": [
+        "en",
+        "es"
+      ]
+    },
+    "AiSource": {
+      "type": "object",
+      "properties": {
+        "documentName": {
+          "type": "string"
+        },
+        "documentId": {
+          "type": "string"
+        },
+        "excerpt": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number"
+        }
+      }
+    },
+    "sources": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Handover"
+        "$ref": "#/definitions/AiSource"
+      }
+    },
+    "AiMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "role": {
+          "$ref": "#/definitions/role"
+        },
+        "content": {
+          "type": "string"
+        },
+        "locale": {
+          "$ref": "#/definitions/locale"
+        },
+        "sources": {
+          "$ref": "#/definitions/sources"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      }
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AiMessage"
       }
     },
     "Model43": {
       "type": "object",
       "properties": {
+        "conversation": {
+          "$ref": "#/definitions/AiConversation"
+        },
+        "messages": {
+          "$ref": "#/definitions/messages"
+        }
+      }
+    },
+    "aiGetConversationResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "AI2002"
+        },
+        "message": {
+          "type": "string",
+          "example": "Conversation retrieved successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model43"
+        }
+      }
+    },
+    "aiGetConversationUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "aiGetConversationNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "AI4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Conversation not found"
+        }
+      }
+    },
+    "Model44": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Handover"
+      }
+    },
+    "Model45": {
+      "type": "object",
+      "properties": {
         "handovers": {
-          "$ref": "#/definitions/Model42"
+          "$ref": "#/definitions/Model44"
         },
         "total": {
           "type": "number"
@@ -10209,7 +10608,7 @@
           "example": "Handovers retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model43"
+          "$ref": "#/definitions/Model45"
         }
       }
     },
@@ -10842,7 +11241,7 @@
         }
       }
     },
-    "Model44": {
+    "Model46": {
       "type": "object",
       "properties": {
         "destination": {
@@ -10866,7 +11265,7 @@
           "example": "Webhook destination retrieved successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model44"
+          "$ref": "#/definitions/Model46"
         }
       }
     },
@@ -11091,7 +11490,7 @@
         }
       }
     },
-    "Model45": {
+    "Model47": {
       "type": "object",
       "properties": {
         "name": {
@@ -11142,7 +11541,7 @@
         }
       }
     },
-    "Model46": {
+    "Model48": {
       "type": "object",
       "properties": {
         "apiKey": {
@@ -11166,7 +11565,7 @@
           "example": "API key created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model46"
+          "$ref": "#/definitions/Model48"
         }
       }
     },
@@ -11238,7 +11637,7 @@
         }
       }
     },
-    "Model47": {
+    "Model49": {
       "type": "object",
       "properties": {
         "name": {
@@ -11350,7 +11749,7 @@
         "serialNumber"
       ]
     },
-    "Model48": {
+    "Model50": {
       "type": "object",
       "properties": {
         "asset": {
@@ -11374,7 +11773,7 @@
           "example": "Asset created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model48"
+          "$ref": "#/definitions/Model50"
         }
       }
     },
@@ -11446,14 +11845,14 @@
         }
       }
     },
-    "Model49": {
+    "Model51": {
       "type": "array",
       "items": {
         "type": "string",
         "maxLength": 200
       }
     },
-    "Model50": {
+    "Model52": {
       "type": "object",
       "properties": {
         "fieldKey": {
@@ -11472,7 +11871,7 @@
           "type": "boolean"
         },
         "options": {
-          "$ref": "#/definitions/Model49"
+          "$ref": "#/definitions/Model51"
         },
         "helpText": {
           "type": "string",
@@ -11495,13 +11894,13 @@
         "dataType"
       ]
     },
-    "Model51": {
+    "Model53": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Model50"
+        "$ref": "#/definitions/Model52"
       }
     },
-    "Model52": {
+    "Model54": {
       "type": "object",
       "properties": {
         "name": {
@@ -11518,14 +11917,14 @@
           "maxLength": 500
         },
         "fields": {
-          "$ref": "#/definitions/Model51"
+          "$ref": "#/definitions/Model53"
         }
       },
       "required": [
         "name"
       ]
     },
-    "Model53": {
+    "Model55": {
       "type": "object",
       "properties": {
         "category": {
@@ -11549,7 +11948,7 @@
           "example": "Category created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model53"
+          "$ref": "#/definitions/Model55"
         }
       }
     },
@@ -11657,7 +12056,7 @@
         }
       }
     },
-    "Model54": {
+    "Model56": {
       "type": "object",
       "properties": {
         "entityType": {
@@ -11788,7 +12187,7 @@
         "VALID_ROWS_ONLY"
       ]
     },
-    "Model55": {
+    "Model57": {
       "type": "object",
       "properties": {
         "partialMode": {
@@ -11820,14 +12219,14 @@
           }
         },
         "options": {
-          "$ref": "#/definitions/Model55"
+          "$ref": "#/definitions/Model57"
         }
       },
       "required": [
         "columns"
       ]
     },
-    "Model56": {
+    "Model58": {
       "type": "object",
       "properties": {
         "name": {
@@ -11897,7 +12296,7 @@
         }
       }
     },
-    "Model57": {
+    "Model59": {
       "type": "object",
       "properties": {
         "name": {
@@ -11910,7 +12309,7 @@
         "name"
       ]
     },
-    "Model58": {
+    "Model60": {
       "type": "object",
       "properties": {
         "id": {
@@ -11943,11 +12342,11 @@
         "imageFilename"
       ]
     },
-    "Model59": {
+    "Model61": {
       "type": "object",
       "properties": {
         "manufacturer": {
-          "$ref": "#/definitions/Model58"
+          "$ref": "#/definitions/Model60"
         }
       }
     },
@@ -11967,7 +12366,7 @@
           "example": "Manufacturer created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model59"
+          "$ref": "#/definitions/Model61"
         }
       }
     },
@@ -12039,7 +12438,7 @@
         }
       }
     },
-    "Model60": {
+    "Model62": {
       "type": "object",
       "properties": {
         "name": {
@@ -12072,7 +12471,7 @@
         "longitude"
       ]
     },
-    "Model61": {
+    "Model63": {
       "type": "object",
       "properties": {
         "site": {
@@ -12096,7 +12495,7 @@
           "example": "Site created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model61"
+          "$ref": "#/definitions/Model63"
         }
       }
     },
@@ -12158,7 +12557,7 @@
         "USER"
       ]
     },
-    "Model62": {
+    "Model64": {
       "type": "object",
       "properties": {
         "email": {
@@ -12267,7 +12666,7 @@
         }
       }
     },
-    "Model63": {
+    "Model65": {
       "type": "object",
       "properties": {
         "name": {
@@ -12280,7 +12679,7 @@
         "name"
       ]
     },
-    "Model64": {
+    "Model66": {
       "type": "object",
       "properties": {
         "id": {
@@ -12313,11 +12712,11 @@
         "imageFilename"
       ]
     },
-    "Model65": {
+    "Model67": {
       "type": "object",
       "properties": {
         "vendor": {
-          "$ref": "#/definitions/Model64"
+          "$ref": "#/definitions/Model66"
         }
       }
     },
@@ -12337,7 +12736,7 @@
           "example": "Vendor created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model65"
+          "$ref": "#/definitions/Model67"
         }
       }
     },
@@ -12409,7 +12808,7 @@
         }
       }
     },
-    "Model66": {
+    "Model68": {
       "type": "object",
       "properties": {
         "email": {
@@ -12440,7 +12839,7 @@
         }
       }
     },
-    "Model67": {
+    "Model69": {
       "type": "object",
       "properties": {
         "email": {
@@ -12467,7 +12866,7 @@
         "platform"
       ]
     },
-    "Model68": {
+    "Model70": {
       "type": "object",
       "properties": {
         "id": {
@@ -12488,7 +12887,7 @@
         }
       }
     },
-    "Model69": {
+    "Model71": {
       "type": "object",
       "properties": {
         "token": {
@@ -12496,7 +12895,7 @@
           "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         },
         "user": {
-          "$ref": "#/definitions/Model68"
+          "$ref": "#/definitions/Model70"
         }
       }
     },
@@ -12516,7 +12915,7 @@
           "example": "Login successful"
         },
         "data": {
-          "$ref": "#/definitions/Model69"
+          "$ref": "#/definitions/Model71"
         }
       }
     },
@@ -12554,7 +12953,7 @@
         }
       }
     },
-    "Model70": {
+    "Model72": {
       "type": "object",
       "properties": {
         "email": {
@@ -12654,7 +13053,7 @@
         }
       }
     },
-    "Model71": {
+    "Model73": {
       "type": "object",
       "properties": {
         "email": {
@@ -12697,7 +13096,7 @@
         }
       ]
     },
-    "Model72": {
+    "Model74": {
       "type": "object",
       "properties": {
         "token": {
@@ -12754,7 +13153,7 @@
         }
       }
     },
-    "Model73": {
+    "Model75": {
       "type": "object",
       "properties": {
         "token": {
@@ -12853,7 +13252,7 @@
         }
       }
     },
-    "Model74": {
+    "Model76": {
       "type": "object",
       "properties": {
         "token": {
@@ -12864,14 +13263,14 @@
         "token"
       ]
     },
-    "Model75": {
+    "Model77": {
       "type": "object"
     },
-    "Model76": {
+    "Model78": {
       "type": "object",
       "properties": {
         "asset": {
-          "$ref": "#/definitions/Model75"
+          "$ref": "#/definitions/Model77"
         },
         "handoverId": {
           "type": "string",
@@ -12897,7 +13296,7 @@
           "example": "Handover accepted successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model76"
+          "$ref": "#/definitions/Model78"
         }
       }
     },
@@ -12986,6 +13385,131 @@
         }
       }
     },
+    "Model79": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 2000
+        },
+        "conversationId": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "locale": {
+          "$ref": "#/definitions/locale"
+        }
+      },
+      "required": [
+        "message",
+        "locale"
+      ]
+    },
+    "aiChatResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "AI2000"
+        },
+        "message": {
+          "type": "string",
+          "example": "Streaming RAG response (SSE)"
+        }
+      }
+    },
+    "aiChatBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "AI4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid chat request"
+        }
+      }
+    },
+    "aiChatUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "aiChatForbidden": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 403
+        },
+        "code": {
+          "type": "string",
+          "example": "AI4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Admin access required"
+        }
+      }
+    },
+    "aiChatConflict": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 429
+        },
+        "code": {
+          "type": "string",
+          "example": "AI4290"
+        },
+        "message": {
+          "type": "string",
+          "example": "Rate limit exceeded"
+        }
+      }
+    },
+    "aiChatInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 503
+        },
+        "code": {
+          "type": "string",
+          "example": "AI5030"
+        },
+        "message": {
+          "type": "string",
+          "example": "AI assistant is unavailable"
+        }
+      }
+    },
     "mode": {
       "type": "string",
       "enum": [
@@ -13004,7 +13528,7 @@
         }
       }
     },
-    "Model77": {
+    "Model80": {
       "type": "object",
       "properties": {
         "type": {
@@ -13081,7 +13605,7 @@
         }
       }
     },
-    "Model78": {
+    "Model81": {
       "type": "object",
       "properties": {
         "type": {
@@ -13195,7 +13719,7 @@
         }
       }
     },
-    "Model79": {
+    "Model82": {
       "type": "object",
       "properties": {
         "name": {
@@ -13226,7 +13750,7 @@
         "subscribedEvents"
       ]
     },
-    "Model80": {
+    "Model83": {
       "type": "object",
       "properties": {
         "destination": {
@@ -13250,7 +13774,7 @@
           "example": "Webhook destination created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model80"
+          "$ref": "#/definitions/Model83"
         }
       }
     },
@@ -13322,14 +13846,14 @@
         }
       }
     },
-    "Model81": {
+    "Model84": {
       "type": "object"
     },
-    "Model82": {
+    "Model85": {
       "type": "object",
       "properties": {
         "asset": {
-          "$ref": "#/definitions/Model81"
+          "$ref": "#/definitions/Model84"
         }
       }
     },
@@ -13349,7 +13873,7 @@
           "example": "Handover accepted successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model82"
+          "$ref": "#/definitions/Model85"
         }
       }
     },
@@ -13438,7 +13962,7 @@
         }
       }
     },
-    "Model83": {
+    "Model86": {
       "type": "object",
       "properties": {
         "apiKey": {
@@ -13462,7 +13986,7 @@
           "example": "API key regenerated successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model83"
+          "$ref": "#/definitions/Model86"
         }
       }
     },
@@ -13534,7 +14058,7 @@
         }
       }
     },
-    "Model84": {
+    "Model87": {
       "type": "object",
       "properties": {
         "type": {
@@ -13555,7 +14079,7 @@
         "targetUserId"
       ]
     },
-    "Model85": {
+    "Model88": {
       "type": "object",
       "properties": {
         "handover": {
@@ -13582,7 +14106,7 @@
           "example": "Handover created successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model85"
+          "$ref": "#/definitions/Model88"
         }
       }
     },
@@ -13739,14 +14263,14 @@
         }
       }
     },
-    "Model86": {
+    "Model89": {
       "type": "object"
     },
-    "Model87": {
+    "Model90": {
       "type": "object",
       "properties": {
         "asset": {
-          "$ref": "#/definitions/Model86"
+          "$ref": "#/definitions/Model89"
         }
       }
     },
@@ -13766,7 +14290,7 @@
           "example": "Handover completed successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model87"
+          "$ref": "#/definitions/Model90"
         }
       }
     },
@@ -13855,7 +14379,7 @@
         }
       }
     },
-    "Model88": {
+    "Model91": {
       "type": "object",
       "properties": {
         "handover": {
@@ -13879,7 +14403,7 @@
           "example": "Handover cancelled successfully"
         },
         "data": {
-          "$ref": "#/definitions/Model88"
+          "$ref": "#/definitions/Model91"
         }
       }
     },
@@ -14121,7 +14645,7 @@
         }
       }
     },
-    "Model89": {
+    "Model92": {
       "type": "object",
       "properties": {
         "assetId": {
@@ -14139,7 +14663,7 @@
         "issue"
       ]
     },
-    "Model90": {
+    "Model93": {
       "type": "object"
     },
     "dismissDataQualityResponse": {
@@ -14158,7 +14682,7 @@
           "example": "Data quality issue dismissed"
         },
         "data": {
-          "$ref": "#/definitions/Model90"
+          "$ref": "#/definitions/Model93"
         }
       }
     },
@@ -14434,7 +14958,7 @@
         }
       }
     },
-    "Model91": {
+    "Model94": {
       "type": "object",
       "properties": {
         "type": {
@@ -14618,1256 +15142,7 @@
         }
       }
     },
-    "Model92": {
-      "type": "object",
-      "properties": {
-        "currentPassword": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string",
-          "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
-        },
-        "passwordConfirmation": {
-          "$ref": "#/definitions/passwordConfirmation"
-        }
-      },
-      "required": [
-        "currentPassword",
-        "password",
-        "passwordConfirmation"
-      ]
-    },
-    "changePasswordResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "USR2001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Password changed successfully"
-        }
-      }
-    },
-    "changePasswordBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "USR4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Current password is incorrect"
-        }
-      }
-    },
-    "Model93": {
-      "type": "object",
-      "properties": {
-        "displayName": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 100
-        }
-      }
-    },
-    "updateProfileResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "USR2002"
-        },
-        "message": {
-          "type": "string",
-          "example": "Profile updated successfully"
-        }
-      }
-    },
-    "updateProfileBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "USR4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "Model94": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 200
-        },
-        "model": {
-          "type": "string",
-          "maxLength": 200
-        },
-        "serialNumber": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 200
-        },
-        "status": {
-          "$ref": "#/definitions/status"
-        },
-        "assignedUserId": {
-          "type": "string",
-          "x-format": {
-            "guid": true
-          }
-        },
-        "siteId": {
-          "type": "string",
-          "x-format": {
-            "guid": true
-          }
-        },
-        "latitude": {
-          "type": "number",
-          "minimum": -90,
-          "maximum": 90
-        },
-        "longitude": {
-          "type": "number",
-          "minimum": -180,
-          "maximum": 180
-        },
-        "note": {
-          "type": "string",
-          "maxLength": 2000
-        },
-        "manufacturerId": {
-          "type": "string",
-          "x-format": {
-            "guid": true
-          }
-        },
-        "vendorId": {
-          "type": "string",
-          "x-format": {
-            "guid": true
-          }
-        },
-        "parentAssetId": {
-          "type": "string",
-          "x-format": {
-            "guid": true
-          }
-        },
-        "categoryId": {
-          "type": "string",
-          "x-format": {
-            "guid": true
-          }
-        },
-        "customFields": {
-          "$ref": "#/definitions/customFields"
-        },
-        "purchaseDate": {
-          "type": "string",
-          "x-format": {
-            "isoDate": true
-          }
-        },
-        "purchaseCost": {
-          "type": "number",
-          "minimum": 0
-        },
-        "salvageValue": {
-          "type": "number",
-          "minimum": 0
-        },
-        "usefulLifeMonths": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "depreciationMethod": {
-          "$ref": "#/definitions/depreciationMethod"
-        },
-        "warrantyEndDate": {
-          "type": "string",
-          "x-format": {
-            "isoDate": true
-          }
-        },
-        "expectedReturnDate": {
-          "type": "string",
-          "x-format": {
-            "isoDate": true
-          }
-        }
-      }
-    },
     "Model95": {
-      "type": "object",
-      "properties": {
-        "asset": {
-          "$ref": "#/definitions/Asset"
-        }
-      }
-    },
-    "updateAssetResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "AST2003"
-        },
-        "message": {
-          "type": "string",
-          "example": "Asset updated successfully"
-        },
-        "data": {
-          "$ref": "#/definitions/Model95"
-        }
-      }
-    },
-    "updateAssetBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "AST4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "updateAssetUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "updateAssetNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "AST4040"
-        },
-        "message": {
-          "type": "string",
-          "example": "Asset not found"
-        }
-      }
-    },
-    "updateAssetConflict": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 409
-        },
-        "code": {
-          "type": "string",
-          "example": "AST4090"
-        },
-        "message": {
-          "type": "string",
-          "example": "Serial number already exists"
-        }
-      }
-    },
-    "updateAssetInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "AST5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to update asset"
-        }
-      }
-    },
-    "Model96": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Model50"
-      }
-    },
-    "Model97": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 200
-        },
-        "icon": {
-          "type": "string",
-          "maxLength": 50
-        },
-        "description": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "fields": {
-          "$ref": "#/definitions/Model96"
-        }
-      }
-    },
-    "Model98": {
-      "type": "object",
-      "properties": {
-        "category": {
-          "$ref": "#/definitions/Category"
-        }
-      }
-    },
-    "updateCategoryResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "CAT2003"
-        },
-        "message": {
-          "type": "string",
-          "example": "Category updated successfully"
-        },
-        "data": {
-          "$ref": "#/definitions/Model98"
-        }
-      }
-    },
-    "updateCategoryBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "CAT4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "updateCategoryUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "updateCategoryNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "CAT4040"
-        },
-        "message": {
-          "type": "string",
-          "example": "Category not found"
-        }
-      }
-    },
-    "updateCategoryConflict": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 409
-        },
-        "code": {
-          "type": "string",
-          "example": "CAT4090"
-        },
-        "message": {
-          "type": "string",
-          "example": "A category with this name already exists"
-        }
-      }
-    },
-    "updateCategoryInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "CAT5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to update category"
-        }
-      }
-    },
-    "Model99": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 200
-        }
-      }
-    },
-    "Model100": {
-      "type": "object",
-      "properties": {
-        "manufacturer": {
-          "$ref": "#/definitions/Manufacturer"
-        }
-      }
-    },
-    "updateManufacturerResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "MFR2003"
-        },
-        "message": {
-          "type": "string",
-          "example": "Manufacturer updated successfully"
-        },
-        "data": {
-          "$ref": "#/definitions/Model100"
-        }
-      }
-    },
-    "updateManufacturerBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "MFR4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "updateManufacturerUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "updateManufacturerNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "MFR4040"
-        },
-        "message": {
-          "type": "string",
-          "example": "Manufacturer not found"
-        }
-      }
-    },
-    "updateManufacturerConflict": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 409
-        },
-        "code": {
-          "type": "string",
-          "example": "MFR4090"
-        },
-        "message": {
-          "type": "string",
-          "example": "A manufacturer with this name already exists"
-        }
-      }
-    },
-    "updateManufacturerInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "MFR5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to update manufacturer"
-        }
-      }
-    },
-    "Model101": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 200
-        },
-        "description": {
-          "type": "string",
-          "maxLength": 2000
-        },
-        "address": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "latitude": {
-          "type": "number",
-          "minimum": -90,
-          "maximum": 90
-        },
-        "longitude": {
-          "type": "number",
-          "minimum": -180,
-          "maximum": 180
-        }
-      }
-    },
-    "Model102": {
-      "type": "object",
-      "properties": {
-        "site": {
-          "$ref": "#/definitions/Site"
-        }
-      }
-    },
-    "updateSiteResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "STE2003"
-        },
-        "message": {
-          "type": "string",
-          "example": "Site updated successfully"
-        },
-        "data": {
-          "$ref": "#/definitions/Model102"
-        }
-      }
-    },
-    "updateSiteBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "STE4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "updateSiteUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "updateSiteNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "STE4040"
-        },
-        "message": {
-          "type": "string",
-          "example": "Site not found"
-        }
-      }
-    },
-    "updateSiteInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "STE5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to update site"
-        }
-      }
-    },
-    "Model103": {
-      "type": "string",
-      "enum": [
-        "ACTIVE",
-        "INACTIVE"
-      ]
-    },
-    "Model104": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string",
-          "x-format": {
-            "email": true
-          }
-        },
-        "displayName": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 100
-        },
-        "roleName": {
-          "$ref": "#/definitions/roleName"
-        },
-        "status": {
-          "$ref": "#/definitions/Model103"
-        }
-      }
-    },
-    "updateUserResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "USR2003"
-        },
-        "message": {
-          "type": "string",
-          "example": "User updated successfully"
-        }
-      }
-    },
-    "updateUserBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "USR4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "updateUserUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "updateUserNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "ADU4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "User not found"
-        }
-      }
-    },
-    "updateUserConflict": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 409
-        },
-        "code": {
-          "type": "string",
-          "example": "ADU4002"
-        },
-        "message": {
-          "type": "string",
-          "example": "Email already exists"
-        }
-      }
-    },
-    "updateUserInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "USR5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to update user"
-        }
-      }
-    },
-    "Model105": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 200
-        }
-      }
-    },
-    "Model106": {
-      "type": "object",
-      "properties": {
-        "vendor": {
-          "$ref": "#/definitions/Vendor"
-        }
-      }
-    },
-    "updateVendorResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "VND2003"
-        },
-        "message": {
-          "type": "string",
-          "example": "Vendor updated successfully"
-        },
-        "data": {
-          "$ref": "#/definitions/Model106"
-        }
-      }
-    },
-    "updateVendorBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "VND4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "updateVendorUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "updateVendorNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "VND4040"
-        },
-        "message": {
-          "type": "string",
-          "example": "Vendor not found"
-        }
-      }
-    },
-    "updateVendorConflict": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 409
-        },
-        "code": {
-          "type": "string",
-          "example": "VND4090"
-        },
-        "message": {
-          "type": "string",
-          "example": "A vendor with this name already exists"
-        }
-      }
-    },
-    "updateVendorInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "VND5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to update vendor"
-        }
-      }
-    },
-    "Model107": {
-      "type": "object",
-      "properties": {
-        "columns": {
-          "type": "object",
-          "properties": {
-            "string": {
-              "type": "string"
-            }
-          }
-        },
-        "options": {
-          "$ref": "#/definitions/Model55"
-        }
-      },
-      "required": [
-        "columns"
-      ]
-    },
-    "setMappingResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "IEX2004"
-        },
-        "message": {
-          "type": "string",
-          "example": "Mapping saved"
-        }
-      }
-    },
-    "setMappingBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "IEX4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid mapping"
-        }
-      }
-    },
-    "setMappingUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "Model108": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string",
-          "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
-        },
-        "passwordConfirmation": {
-          "$ref": "#/definitions/passwordConfirmation"
-        }
-      },
-      "required": [
-        "password",
-        "passwordConfirmation"
-      ]
-    },
-    "changeUserPasswordResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "USR2005"
-        },
-        "message": {
-          "type": "string",
-          "example": "Password changed successfully"
-        }
-      }
-    },
-    "changeUserPasswordBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "USR4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Validation error"
-        }
-      }
-    },
-    "changeUserPasswordUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "changeUserPasswordNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "ADU4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "User not found"
-        }
-      }
-    },
-    "changeUserPasswordInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "USR5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to change password"
-        }
-      }
-    },
-    "Model109": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 255,
-          "x-convert": {
-            "trim": true
-          }
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "target": {
-          "$ref": "#/definitions/target"
-        },
-        "subscribedEvents": {
-          "$ref": "#/definitions/subscribedEvents"
-        }
-      }
-    },
-    "Model110": {
-      "type": "object",
-      "properties": {
-        "destination": {
-          "$ref": "#/definitions/WebhookDestination"
-        }
-      }
-    },
-    "updateWebhookDestinationResponse": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 200
-        },
-        "code": {
-          "type": "string",
-          "example": "WHK2003"
-        },
-        "message": {
-          "type": "string",
-          "example": "Webhook destination updated successfully"
-        },
-        "data": {
-          "$ref": "#/definitions/Model110"
-        }
-      }
-    },
-    "updateWebhookDestinationBadRequest": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 400
-        },
-        "code": {
-          "type": "string",
-          "example": "WHK4001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid webhook destination request"
-        }
-      }
-    },
-    "updateWebhookDestinationUnauthorized": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 401
-        },
-        "error": {
-          "type": "string",
-          "example": "Unauthorized"
-        },
-        "message": {
-          "type": "string",
-          "example": "Invalid token"
-        }
-      }
-    },
-    "updateWebhookDestinationNotFound": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 404
-        },
-        "code": {
-          "type": "string",
-          "example": "WHK4040"
-        },
-        "message": {
-          "type": "string",
-          "example": "Webhook destination not found"
-        }
-      }
-    },
-    "updateWebhookDestinationInternalError": {
-      "type": "object",
-      "properties": {
-        "statusCode": {
-          "type": "number",
-          "example": 500
-        },
-        "code": {
-          "type": "string",
-          "example": "WHK5001"
-        },
-        "message": {
-          "type": "string",
-          "example": "Failed to update destination"
-        }
-      }
-    },
-    "Model111": {
       "type": "object",
       "properties": {
         "password": {
@@ -16524,6 +15799,57 @@
         }
       }
     },
+    "aiDeleteConversationResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "AI2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "Conversation deleted successfully"
+        }
+      }
+    },
+    "aiDeleteConversationUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "aiDeleteConversationNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "AI4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Conversation not found"
+        }
+      }
+    },
     "removeAssetImageResponse": {
       "type": "object",
       "properties": {
@@ -16626,7 +15952,7 @@
         }
       }
     },
-    "Model112": {
+    "Model96": {
       "type": "object",
       "properties": {
         "assetId": {
@@ -16644,7 +15970,7 @@
         "issue"
       ]
     },
-    "Model113": {
+    "Model97": {
       "type": "object"
     },
     "restoreDataQualityResponse": {
@@ -16663,7 +15989,7 @@
           "example": "Data quality issue restored"
         },
         "data": {
-          "$ref": "#/definitions/Model113"
+          "$ref": "#/definitions/Model97"
         }
       }
     },
@@ -16936,6 +16262,1255 @@
         "message": {
           "type": "string",
           "example": "Asset not found"
+        }
+      }
+    },
+    "Model98": {
+      "type": "object",
+      "properties": {
+        "currentPassword": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string",
+          "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
+        },
+        "passwordConfirmation": {
+          "$ref": "#/definitions/passwordConfirmation"
+        }
+      },
+      "required": [
+        "currentPassword",
+        "password",
+        "passwordConfirmation"
+      ]
+    },
+    "changePasswordResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "USR2001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Password changed successfully"
+        }
+      }
+    },
+    "changePasswordBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "USR4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Current password is incorrect"
+        }
+      }
+    },
+    "Model99": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      }
+    },
+    "updateProfileResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "USR2002"
+        },
+        "message": {
+          "type": "string",
+          "example": "Profile updated successfully"
+        }
+      }
+    },
+    "updateProfileBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "USR4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "Model100": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "model": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "serialNumber": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "status": {
+          "$ref": "#/definitions/status"
+        },
+        "assignedUserId": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "siteId": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "manufacturerId": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "vendorId": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "parentAssetId": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "categoryId": {
+          "type": "string",
+          "x-format": {
+            "guid": true
+          }
+        },
+        "customFields": {
+          "$ref": "#/definitions/customFields"
+        },
+        "purchaseDate": {
+          "type": "string",
+          "x-format": {
+            "isoDate": true
+          }
+        },
+        "purchaseCost": {
+          "type": "number",
+          "minimum": 0
+        },
+        "salvageValue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "usefulLifeMonths": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "depreciationMethod": {
+          "$ref": "#/definitions/depreciationMethod"
+        },
+        "warrantyEndDate": {
+          "type": "string",
+          "x-format": {
+            "isoDate": true
+          }
+        },
+        "expectedReturnDate": {
+          "type": "string",
+          "x-format": {
+            "isoDate": true
+          }
+        }
+      }
+    },
+    "Model101": {
+      "type": "object",
+      "properties": {
+        "asset": {
+          "$ref": "#/definitions/Asset"
+        }
+      }
+    },
+    "updateAssetResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "AST2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "Asset updated successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model101"
+        }
+      }
+    },
+    "updateAssetBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "AST4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "updateAssetUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "updateAssetNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "AST4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Asset not found"
+        }
+      }
+    },
+    "updateAssetConflict": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 409
+        },
+        "code": {
+          "type": "string",
+          "example": "AST4090"
+        },
+        "message": {
+          "type": "string",
+          "example": "Serial number already exists"
+        }
+      }
+    },
+    "updateAssetInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "AST5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to update asset"
+        }
+      }
+    },
+    "Model102": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Model52"
+      }
+    },
+    "Model103": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "icon": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "fields": {
+          "$ref": "#/definitions/Model102"
+        }
+      }
+    },
+    "Model104": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "$ref": "#/definitions/Category"
+        }
+      }
+    },
+    "updateCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "CAT2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "Category updated successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model104"
+        }
+      }
+    },
+    "updateCategoryBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "CAT4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "updateCategoryUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "updateCategoryNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "CAT4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Category not found"
+        }
+      }
+    },
+    "updateCategoryConflict": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 409
+        },
+        "code": {
+          "type": "string",
+          "example": "CAT4090"
+        },
+        "message": {
+          "type": "string",
+          "example": "A category with this name already exists"
+        }
+      }
+    },
+    "updateCategoryInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "CAT5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to update category"
+        }
+      }
+    },
+    "Model105": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "Model106": {
+      "type": "object",
+      "properties": {
+        "manufacturer": {
+          "$ref": "#/definitions/Manufacturer"
+        }
+      }
+    },
+    "updateManufacturerResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "MFR2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "Manufacturer updated successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model106"
+        }
+      }
+    },
+    "updateManufacturerBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "MFR4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "updateManufacturerUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "updateManufacturerNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "MFR4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Manufacturer not found"
+        }
+      }
+    },
+    "updateManufacturerConflict": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 409
+        },
+        "code": {
+          "type": "string",
+          "example": "MFR4090"
+        },
+        "message": {
+          "type": "string",
+          "example": "A manufacturer with this name already exists"
+        }
+      }
+    },
+    "updateManufacturerInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "MFR5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to update manufacturer"
+        }
+      }
+    },
+    "Model107": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "address": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      }
+    },
+    "Model108": {
+      "type": "object",
+      "properties": {
+        "site": {
+          "$ref": "#/definitions/Site"
+        }
+      }
+    },
+    "updateSiteResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "STE2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "Site updated successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model108"
+        }
+      }
+    },
+    "updateSiteBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "STE4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "updateSiteUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "updateSiteNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "STE4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Site not found"
+        }
+      }
+    },
+    "updateSiteInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "STE5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to update site"
+        }
+      }
+    },
+    "Model109": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "INACTIVE"
+      ]
+    },
+    "Model110": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-format": {
+            "email": true
+          }
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "roleName": {
+          "$ref": "#/definitions/roleName"
+        },
+        "status": {
+          "$ref": "#/definitions/Model109"
+        }
+      }
+    },
+    "updateUserResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "USR2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "User updated successfully"
+        }
+      }
+    },
+    "updateUserBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "USR4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "updateUserUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "updateUserNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "ADU4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "User not found"
+        }
+      }
+    },
+    "updateUserConflict": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 409
+        },
+        "code": {
+          "type": "string",
+          "example": "ADU4002"
+        },
+        "message": {
+          "type": "string",
+          "example": "Email already exists"
+        }
+      }
+    },
+    "updateUserInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "USR5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to update user"
+        }
+      }
+    },
+    "Model111": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "Model112": {
+      "type": "object",
+      "properties": {
+        "vendor": {
+          "$ref": "#/definitions/Vendor"
+        }
+      }
+    },
+    "updateVendorResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "VND2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "Vendor updated successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model112"
+        }
+      }
+    },
+    "updateVendorBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "VND4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "updateVendorUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "updateVendorNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "VND4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Vendor not found"
+        }
+      }
+    },
+    "updateVendorConflict": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 409
+        },
+        "code": {
+          "type": "string",
+          "example": "VND4090"
+        },
+        "message": {
+          "type": "string",
+          "example": "A vendor with this name already exists"
+        }
+      }
+    },
+    "updateVendorInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "VND5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to update vendor"
+        }
+      }
+    },
+    "Model113": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "object",
+          "properties": {
+            "string": {
+              "type": "string"
+            }
+          }
+        },
+        "options": {
+          "$ref": "#/definitions/Model57"
+        }
+      },
+      "required": [
+        "columns"
+      ]
+    },
+    "setMappingResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "IEX2004"
+        },
+        "message": {
+          "type": "string",
+          "example": "Mapping saved"
+        }
+      }
+    },
+    "setMappingBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "IEX4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid mapping"
+        }
+      }
+    },
+    "setMappingUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "Model114": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
+        },
+        "passwordConfirmation": {
+          "$ref": "#/definitions/passwordConfirmation"
+        }
+      },
+      "required": [
+        "password",
+        "passwordConfirmation"
+      ]
+    },
+    "changeUserPasswordResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "USR2005"
+        },
+        "message": {
+          "type": "string",
+          "example": "Password changed successfully"
+        }
+      }
+    },
+    "changeUserPasswordBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "USR4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation error"
+        }
+      }
+    },
+    "changeUserPasswordUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "changeUserPasswordNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "ADU4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "User not found"
+        }
+      }
+    },
+    "changeUserPasswordInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "USR5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to change password"
+        }
+      }
+    },
+    "Model115": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "x-convert": {
+            "trim": true
+          }
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "target": {
+          "$ref": "#/definitions/target"
+        },
+        "subscribedEvents": {
+          "$ref": "#/definitions/subscribedEvents"
+        }
+      }
+    },
+    "Model116": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "$ref": "#/definitions/WebhookDestination"
+        }
+      }
+    },
+    "updateWebhookDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "code": {
+          "type": "string",
+          "example": "WHK2003"
+        },
+        "message": {
+          "type": "string",
+          "example": "Webhook destination updated successfully"
+        },
+        "data": {
+          "$ref": "#/definitions/Model116"
+        }
+      }
+    },
+    "updateWebhookDestinationBadRequest": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "code": {
+          "type": "string",
+          "example": "WHK4001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid webhook destination request"
+        }
+      }
+    },
+    "updateWebhookDestinationUnauthorized": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 401
+        },
+        "error": {
+          "type": "string",
+          "example": "Unauthorized"
+        },
+        "message": {
+          "type": "string",
+          "example": "Invalid token"
+        }
+      }
+    },
+    "updateWebhookDestinationNotFound": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 404
+        },
+        "code": {
+          "type": "string",
+          "example": "WHK4040"
+        },
+        "message": {
+          "type": "string",
+          "example": "Webhook destination not found"
+        }
+      }
+    },
+    "updateWebhookDestinationInternalError": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 500
+        },
+        "code": {
+          "type": "string",
+          "example": "WHK5001"
+        },
+        "message": {
+          "type": "string",
+          "example": "Failed to update destination"
         }
       }
     }
