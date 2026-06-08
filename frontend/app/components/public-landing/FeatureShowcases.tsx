@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { FeatureShowcaseSection } from '~/components/public-landing/FeatureShowcaseSection';
+import { AiAssistantPreview } from '~/components/public-landing/previews/AiAssistantPreview';
 import { AssetsPreview } from '~/components/public-landing/previews/AssetsPreview';
 import { HandoverPreview } from '~/components/public-landing/previews/HandoverPreview';
 import { QrPreview } from '~/components/public-landing/previews/QrPreview';
@@ -38,6 +39,12 @@ const showcases: ShowcaseConfig[] = [
     titleKey: 'landing.showcase.sites.title',
     descKey: 'landing.showcase.sites.desc',
     Preview: SitesPreview,
+  },
+  {
+    eyebrowKey: 'landing.showcase.ai.eyebrow',
+    titleKey: 'landing.showcase.ai.title',
+    descKey: 'landing.showcase.ai.desc',
+    Preview: AiAssistantPreview,
   },
 ];
 

@@ -162,10 +162,20 @@ FRONTEND_URL=http://localhost:3000
 ### 3. Start infrastructure
 
 \`\`\`bash
-docker compose --env-file backend/.env up -d
+docker compose --env-file backend/.env up -d postgres redis-server
 \`\`\`
 
 This starts **PostgreSQL** and **Redis** only. The app runs outside Docker during development.
+
+For the **AI assistant**, also start Qdrant and run \`aiagent\` on the host (see [aiagent/README.md](https://github.com/mdemou/ninjassets/blob/main/aiagent/README.md)):
+
+\`\`\`bash
+docker compose --env-file backend/.env up -d qdrant
+cp aiagent/.env.example aiagent/.env   # set GROK_API_KEY
+cd aiagent && uv sync && uv run uvicorn ai_service.main:app --reload
+\`\`\`
+
+Set \`AI_ASSISTANT_ENABLED=true\` in \`backend/.env\`.
 
 ### 4. Start the API
 
@@ -218,9 +228,16 @@ Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **applicatio
 | \`REDIS_PORT\` | Redis port | \`6379\` |
 | \`REDIS_PASSWORD\` | Redis password (empty = no auth) | \`""\` |
 | \`REDIS_DB\` | Redis logical database index | \`0\` |
-| \`REDIS_NOTIFICATIONS_QUEUE\` | Unified notification job queue (webhooks + email) | \`ninjasset:notifications\` |
-| \`REDIS_NOTIFICATIONS_PROCESSING_QUEUE\` | In-flight list for BRPOPLPUSH at-least-once delivery | \`ninjasset:notifications:processing\` |
-| \`REDIS_IMPORT_EXPORT_QUEUE\` | Import/export job wakeup queue | \`ninjasset:import-export\` |
+
+**Hardcoded in \`config.ts\` (not environment variables):**
+
+| Config path | Purpose | Value |
+|---|---|---|
+| \`config.db.redis.queues.notifications\` | Unified notification job queue (webhooks + email) | \`ninjasset:notifications\` |
+| \`config.db.redis.queues.notificationsProcessing\` | In-flight list for BRPOPLPUSH at-least-once delivery | \`ninjasset:notifications:processing\` |
+| \`config.db.redis.queues.importExportJobs\` | Import/export job wakeup queue | \`ninjasset:import-export\` |
+| \`config.notifications.dedupKeyPrefix\` | Redis key prefix for delivery deduplication | \`ninjasset:notif:dedup:\` |
+| \`config.maintenance.keyPrefix\` | Redis prefix for scheduler last-run timestamps and locks | \`ninjasset:sched:\` |
 
 ### Server
 
@@ -311,7 +328,6 @@ Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **applicatio
 | Variable | Purpose | Default |
 |---|---|---|
 | \`NOTIFICATIONS_ENABLED\` | Consumer + reaper (independent of \`WEBHOOKS_ENABLED\`) | \`true\` |
-| \`NOTIFICATIONS_DEDUP_PREFIX\` | Redis key prefix for delivery deduplication | \`ninjasset:notif:dedup:\` |
 | \`NOTIFICATIONS_DEDUP_TTL_SEC\` | Dedup key TTL in seconds | \`86400\` |
 | \`NOTIFICATIONS_REAPER_INTERVAL_MS\` | How often stale in-flight jobs are reclaimed | \`15000\` |
 | \`NOTIFICATIONS_VISIBILITY_TIMEOUT_MS\` | Processing visibility timeout | \`60000\` |
@@ -331,18 +347,32 @@ Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **applicatio
 | \`IMPORT_SAFETY_SWEEP_MS\` | DB sweep when Redis wakeup was missed | \`30000\` |
 | \`IMPORT_EXPORT_NOTIFY_ON_COMPLETE\` | Email admin when a long job completes | \`false\` |
 
+### Admin AI assistant
+
+| Variable | Purpose | Default |
+|---|---|---|
+| \`AI_ASSISTANT_ENABLED\` | Feature flag — assistant is off unless \`true\` | \`false\` |
+| \`MOCK_AI\` | Canned SSE from backend (no aiagent); E2E/dev only | \`false\` |
+| \`AI_AGENT_URL\` | Base URL of the aiagent RAG service | \`http://localhost:8000\` |
+| \`AI_AGENT_API_KEY\` | Shared secret sent as \`X-Internal-Key\` header | \`""\` |
+| \`AI_TOP_K\` | Retrieval top-K for RAG context | \`5\` |
+| \`AI_MESSAGE_MAX_LENGTH\` | Max user message length (characters) | \`2000\` |
+| \`AI_MESSAGE_MIN_LENGTH\` | Min user message length (characters) | \`3\` |
+| \`AI_HISTORY_MESSAGES\` | Last N messages sent to the LLM as context | \`6\` |
+| \`AI_RATE_LIMIT_PER_HOUR\` | Messages per admin per hour (Redis fixed window) | \`30\` |
+| \`AI_AGENT_TIMEOUT_MS\` | Upstream SSE request timeout | \`60000\` |
+
 ### Periodic maintenance (scheduler)
 
 | Variable | Purpose | Default |
 |---|---|---|
 | \`MAINTENANCE_TICK_MS\` | Scheduler tick interval | \`5000\` |
 | \`MAINTENANCE_LOCK_TTL_SEC\` | Redis lock TTL if a runner dies mid-job | \`300\` |
-| \`MAINTENANCE_KEY_PREFIX\` | Redis prefix for last-run timestamps and locks | \`ninjasset:sched:\` |
 | \`TOKEN_CLEANUP_INTERVAL_MS\` | Expired session/token cleanup cadence | \`21600000\` (6 h) |
 | \`API_RETENTION_PURGE_INTERVAL_MS\` | API access log purge cadence | \`21600000\` (6 h) |
 | \`IMPORT_ARTIFACT_PURGE_INTERVAL_MS\` | Import artifact purge cadence | \`21600000\` (6 h) |
 
-> **Production:** Change JWT secrets, database passwords, and \`API_KEY_PREFIX\` (\`nsk_live_\` vs \`nsk_test_\`). Never set \`MOCK_CAPTCHA\`, \`MOCK_EMAIL\`, or \`WEBHOOK_ALLOW_INSECURE_TARGETS\` in production.
+> **Production:** Change JWT secrets, database passwords, and \`API_KEY_PREFIX\` (\`nsk_live_\` vs \`nsk_test_\`). Never set \`MOCK_CAPTCHA\`, \`MOCK_EMAIL\`, \`MOCK_AI\`, or \`WEBHOOK_ALLOW_INSECURE_TARGETS\` in production.
 `,
   },
 
@@ -357,57 +387,39 @@ This guide covers running NinjAsset in a production-like environment using Docke
 
 ## Production Docker Compose
 
-A minimal \`docker-compose.yml\` for a single-server deployment:
-
-\`\`\`yaml
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: ninjasset
-      POSTGRES_USER: ninjasset
-      POSTGRES_PASSWORD: \${DB_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-
-  backend:
-    image: ninjasset-backend:latest
-    env_file: backend/.env
-    depends_on: [db, redis]
-    ports:
-      - "3001:3001"
-    restart: unless-stopped
-
-  frontend:
-    image: ninjasset-frontend:latest
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-
-volumes:
-  pgdata:
-\`\`\`
-
-## Building production images
+The repo ships a full \`docker-compose.yml\`: PostgreSQL, Redis, **Qdrant**, **aiagent** (RAG service), backend, and frontend.
 
 \`\`\`bash
-# Backend
-cd backend
-npm run build
-npm start
+cp backend/.env.example backend/.env
+cp aiagent/.env.example aiagent/.env
+# backend: AI_ASSISTANT_ENABLED=true, AI_AGENT_API_KEY=...
+# aiagent: GROK_API_KEY=..., same AI_AGENT_API_KEY
 
-# Frontend
-cd frontend
-npm run build
-npm start
+docker compose --env-file backend/.env pull
+docker compose --env-file backend/.env up -d
 \`\`\`
 
-Set \`NODE_ENV=production\` before building.
+| Service | Image | Notes |
+|---|---|---|
+| \`postgres\`, \`redis-server\` | Official images | Persistent volumes |
+| \`qdrant\` | \`qdrant/qdrant\` | Vector store for RAG |
+| \`aiagent\` | \`ghcr.io/<owner>/ninjasset-aiagent\` | ~2 GB (deps only); embedding model via volume |
+| \`backend\` | \`ghcr.io/<owner>/ninjasset-backend\` | Migrations on startup; \`/app/uploads\` volume |
+| \`frontend\` | \`ghcr.io/<owner>/ninjasset-frontend\` | nginx on port 3000 |
+
+**Embedding model:** the aiagent image does not include the ~1.1 GB Hugging Face weights. Compose bind-mounts \`~/.cache/huggingface\` by default (override with \`HF_CACHE_DIR\` in a \`.env\` next to \`docker-compose.yml\`).
+
+Images are published on version tags (\`v*\`) to GitHub Container Registry. Log in with \`docker login ghcr.io\` if packages are private.
+
+## Building production images locally
+
+\`\`\`bash
+docker build -t ninjasset-backend backend/
+docker build -t ninjasset-frontend frontend/
+docker build -t ninjasset-aiagent aiagent/
+\`\`\`
+
+Or build backend/frontend on the host with \`npm run build\` and set \`NODE_ENV=production\`.
 
 ## Running database migrations
 

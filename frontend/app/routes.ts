@@ -32,5 +32,6 @@ export default [
   route("admin/api-keys", "routes/admin.api-keys.tsx"),
   route("admin/webhooks", "routes/admin.webhooks.tsx"),
   route("admin/import-export", "routes/admin.import-export.tsx"),
+  route("admin/ai", "routes/admin.ai.tsx"),
   route("*", "routes/$.tsx"),
 ] satisfies RouteConfig;

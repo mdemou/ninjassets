@@ -193,7 +193,7 @@ export default function AdminImportExport() {
   return (
     <PageContent size="wide">
       <h1 className="text-3xl font-semibold mb-2">{t('ie.title')}</h1>
-      <p className="text-muted mb-4 max-w-3xl">{t('ie.subtitle')}</p>
+      <p className="text-sm text-muted mb-4">{t('ie.subtitle')}</p>
 
       <UnderlineTabBar
         className="mb-4"

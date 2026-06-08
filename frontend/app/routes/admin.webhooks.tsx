@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { Button } from '~/components/Button';
 import { Modal } from '~/components/Modal';
@@ -626,6 +626,9 @@ export default function AdminWebhooks() {
   const [form, setForm] = useState<FormState | null>(null);
   const [createStep, setCreateStep] = useState<CreateStep>('platform');
   const [saving, setSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingDestination, setDeletingDestination] = useState<WebhookDestination | null>(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
 
   const toastError = useCallback(
     (err: unknown) => {
@@ -774,14 +777,25 @@ export default function AdminWebhooks() {
     }
   };
 
-  const remove = async (d: WebhookDestination) => {
-    if (!window.confirm(t('webhooks.deleteConfirm'))) return;
+  const openDeleteModal = (d: WebhookDestination) => {
+    setDeletingDestination(d);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!deletingDestination) return;
+    setDeleteSubmitting(true);
     try {
-      await api.delete(`/api/p/webhooks/destinations/${d.id}`);
+      await api.delete(`/api/p/webhooks/destinations/${deletingDestination.id}`);
       addToast({ type: 'success', title: t('common.success'), message: t('webhooks.deleted') });
+      setShowDeleteModal(false);
+      setDeletingDestination(null);
       void fetchAll();
     } catch (err) {
       toastError(err);
+    } finally {
+      setDeleteSubmitting(false);
     }
   };
 
@@ -797,7 +811,7 @@ export default function AdminWebhooks() {
           {t('webhooks.createButton')}
         </Button>
       </div>
-      <p className="text-muted-foreground mb-6 max-w-3xl">{t('webhooks.subtitle')}</p>
+      <p className="text-sm text-muted mb-4">{t('webhooks.subtitle')}</p>
 
       <Panel>
         {loading ? (
@@ -849,7 +863,7 @@ export default function AdminWebhooks() {
                         title={t(d.enabled ? 'webhooks.disable' : 'webhooks.enable')}
                       />
                       <EditIconButton onClick={() => openEdit(d)} title={t('webhooks.edit')} />
-                      <DeleteIconButton onClick={() => void remove(d)} title={t('webhooks.delete')} />
+                      <DeleteIconButton onClick={() => openDeleteModal(d)} title={t('webhooks.delete')} />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -858,6 +872,36 @@ export default function AdminWebhooks() {
           </Table>
         )}
       </Panel>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletingDestination(null);
+        }}
+        title={t('webhooks.delete')}
+        size="lg"
+      >
+        <p className="mb-4">{t('webhooks.deleteConfirm')}</p>
+        {deletingDestination && <p className="mb-4 text-muted">{deletingDestination.name}</p>}
+        <form onSubmit={(e) => void handleDeleteSubmit(e)}>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="tertiary"
+              type="button"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeletingDestination(null);
+              }}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button variant="danger" type="submit" disabled={deleteSubmitting}>
+              {deleteSubmitting ? t('common.loading') : t('webhooks.delete')}
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       <Modal
         isOpen={form !== null}

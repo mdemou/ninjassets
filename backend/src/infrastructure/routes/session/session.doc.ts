@@ -45,6 +45,7 @@ const sessionDocs = {
     responses: createResponseDoc('publicConfig', sessionResponses.publicConfigOk, {
       dataSchema: Joi.object({
         signupEnabled: Joi.boolean().example(true),
+        aiEnabled: Joi.boolean().example(false),
       }),
     }),
     parameters: {},

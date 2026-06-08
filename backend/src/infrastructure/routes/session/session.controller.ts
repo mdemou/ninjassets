@@ -53,6 +53,8 @@ export const sessionController = {
     try {
       response = responsesService.createResponseData(sessionResponses.publicConfigOk, {
         signupEnabled: config.signupEnabled,
+        // Drives the admin AI-assistant sidebar item (SPEC-AI-ASSISTANT-001 §11.3).
+        aiEnabled: config.ai.enabled || config.mockAi,
       });
     } catch (error) {
       logger.error(__filename, 'publicConfig', 'error', error);

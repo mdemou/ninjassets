@@ -190,6 +190,21 @@ async function main() {
     await waitForStable(page);
     await shot(page, 'admin-import-export');
 
+    await page.goto('/admin/ai');
+    await waitForStable(page);
+    const aiInput = page.getByTestId('ai-input');
+    if (await aiInput.isVisible().catch(() => false)) {
+      await aiInput.fill('How do I create an API key?');
+      await page.getByTestId('ai-send').click();
+      await page
+        .getByTestId('ai-message-assistant')
+        .last()
+        .waitFor({ state: 'visible', timeout: 30_000 })
+        .catch(() => {});
+      await page.waitForTimeout(800);
+    }
+    await shot(page, 'admin-ai');
+
     await assignDemoAssetsToUser(USER_EMAIL, 6);
 
     await page.goto('/logout');

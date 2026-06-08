@@ -114,6 +114,24 @@ const features: Feature[] = [
       </svg>
     ),
   },
+  {
+    titleKey: 'landing.features.ai.title',
+    descKey: 'landing.features.ai.desc',
+    accent: 'from-[var(--color-secondary)] to-[var(--color-secondary-light)]',
+    icon: (
+      <svg {...landingIconProps}>
+        <path d="M12 8V4H8" />
+        <rect
+          width="16"
+          height="12"
+          x="4"
+          y="8"
+          rx="2"
+        />
+        <path d="M2 14h2M20 14h2M15 13v2M9 13v2" />
+      </svg>
+    ),
+  },
 ];
 
 const stepIcons = [
@@ -188,6 +206,7 @@ const highlights: TranslationKey[] = [
   'landing.features.assets.title',
   'landing.features.handover.title',
   'landing.features.qr.title',
+  'landing.features.ai.title',
   'landing.features.api.title',
 ];
 

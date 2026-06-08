@@ -379,8 +379,9 @@ The maintenance concern is addressed in **two layers**, with the type system as 
 | `WEBHOOK_ALLOWED_SLACK_HOSTS` | `hooks.slack.com` | SSRF allowlist. |
 | `WEBHOOK_ALLOWED_DISCORD_HOSTS` | `discord.com,discordapp.com` | SSRF allowlist. |
 | `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` / `REDIS_DB` | localhost / 6379 / — / 0 | Redis connection (`config.db.redis`). Tests use db `1`. |
-| `REDIS_NOTIFICATIONS_QUEUE` | `ninjasset:notifications` | Redis list key for notification jobs. |
 | `FRONTEND_URL` | (existing) | Base for deep links in payloads (§10). |
+
+Redis queue keys are **hardcoded** in `config.db.redis.queues` (`ninjasset:notifications`, `ninjasset:notifications:processing`, `ninjasset:import-export`); dedup prefix `config.notifications.dedupKeyPrefix` is `ninjasset:notif:dedup:` — not environment variables.
 
 ## 18. Backend layering
 

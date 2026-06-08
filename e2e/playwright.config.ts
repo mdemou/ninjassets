@@ -71,6 +71,9 @@ export default defineConfig({
         FRONTEND_URL: `http://localhost:${TEST_FRONTEND_PORT}`,
         MOCK_CAPTCHA: "true",
         MOCK_EMAIL: "true",
+        // AI assistant: enabled + canned SSE from the backend (no aiagent/Qdrant/LLM).
+        AI_ASSISTANT_ENABLED: "true",
+        MOCK_AI: "true",
         // Isolate the test backend's Redis traffic (notification queue) from dev (db 0).
         REDIS_DB: String(TEST_REDIS_DB),
         // Allow webhook delivery to a local mock receiver (loopback/http).

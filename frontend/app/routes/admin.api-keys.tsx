@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { Avatar } from '~/components/Avatar';
 import { Badge, type BadgeVariant } from '~/components/Badge';
@@ -108,6 +108,14 @@ export default function AdminApiKeys() {
   const [secret, setSecret] = useState<ApiKeySecret | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const [showRevokeModal, setShowRevokeModal] = useState(false);
+  const [revokingKey, setRevokingKey] = useState<ApiKey | null>(null);
+  const [revokeSubmitting, setRevokeSubmitting] = useState(false);
+
+  const [showRegenerateModal, setShowRegenerateModal] = useState(false);
+  const [regeneratingKey, setRegeneratingKey] = useState<ApiKey | null>(null);
+  const [regenerateSubmitting, setRegenerateSubmitting] = useState(false);
+
   const toastError = useCallback(
     (err: unknown) => {
       const error = err as ApiResponse;
@@ -174,27 +182,49 @@ export default function AdminApiKeys() {
     }
   };
 
-  const revoke = async (key: ApiKey) => {
-    if (!window.confirm(t('apiKeys.revokeConfirm'))) return;
+  const openRevokeModal = (key: ApiKey) => {
+    setRevokingKey(key);
+    setShowRevokeModal(true);
+  };
+
+  const handleRevokeSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!revokingKey) return;
+    setRevokeSubmitting(true);
     try {
-      await api.delete(`/api/p/api-keys/${key.id}`);
+      await api.delete(`/api/p/api-keys/${revokingKey.id}`);
       addToast({ type: 'success', title: t('common.success'), message: t('apiKeys.revoked') });
+      setShowRevokeModal(false);
+      setRevokingKey(null);
       void fetchKeys();
     } catch (err) {
       toastError(err);
+    } finally {
+      setRevokeSubmitting(false);
     }
   };
 
-  const regenerate = async (key: ApiKey) => {
-    if (!window.confirm(t('apiKeys.regenerateConfirm'))) return;
+  const openRegenerateModal = (key: ApiKey) => {
+    setRegeneratingKey(key);
+    setShowRegenerateModal(true);
+  };
+
+  const handleRegenerateSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!regeneratingKey) return;
+    setRegenerateSubmitting(true);
     try {
-      const res = await api.post<ApiKeySecretData>(`/api/p/api-keys/${key.id}/regenerate`);
+      const res = await api.post<ApiKeySecretData>(`/api/p/api-keys/${regeneratingKey.id}/regenerate`);
       setCopied(false);
       setSecret(res.data?.apiKey ?? null);
       addToast({ type: 'success', title: t('common.success'), message: t('apiKeys.regenerated') });
+      setShowRegenerateModal(false);
+      setRegeneratingKey(null);
       void fetchKeys();
     } catch (err) {
       toastError(err);
+    } finally {
+      setRegenerateSubmitting(false);
     }
   };
 
@@ -224,7 +254,7 @@ export default function AdminApiKeys() {
           {t('apiKeys.createButton')}
         </Button>
       </div>
-      <p className="text-muted mb-4 max-w-3xl">{t('apiKeys.subtitle')}</p>
+      <p className="text-sm text-muted mb-4">{t('apiKeys.subtitle')}</p>
 
       <UnderlineTabBar
         className="mb-4"
@@ -304,14 +334,14 @@ export default function AdminApiKeys() {
                             <Button
                               variant="tertiary"
                               className="px-3 py-1 text-xs"
-                              onClick={() => void regenerate(key)}
+                              onClick={() => openRegenerateModal(key)}
                             >
                               {t('apiKeys.regenerate')}
                             </Button>
                             <Button
                               variant="danger"
                               className="px-3 py-1 text-xs"
-                              onClick={() => void revoke(key)}
+                              onClick={() => openRevokeModal(key)}
                             >
                               {t('apiKeys.revoke')}
                             </Button>
@@ -384,6 +414,66 @@ export default function AdminApiKeys() {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={showRevokeModal}
+        onClose={() => {
+          setShowRevokeModal(false);
+          setRevokingKey(null);
+        }}
+        title={t('apiKeys.revoke')}
+        size="lg"
+      >
+        <p className="mb-4">{t('apiKeys.revokeConfirm')}</p>
+        {revokingKey && <p className="mb-4 text-muted">{revokingKey.name}</p>}
+        <form onSubmit={(e) => void handleRevokeSubmit(e)}>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="tertiary"
+              type="button"
+              onClick={() => {
+                setShowRevokeModal(false);
+                setRevokingKey(null);
+              }}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button variant="danger" type="submit" disabled={revokeSubmitting}>
+              {revokeSubmitting ? t('common.loading') : t('apiKeys.revoke')}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={showRegenerateModal}
+        onClose={() => {
+          setShowRegenerateModal(false);
+          setRegeneratingKey(null);
+        }}
+        title={t('apiKeys.regenerate')}
+        size="lg"
+      >
+        <p className="mb-4">{t('apiKeys.regenerateConfirm')}</p>
+        {regeneratingKey && <p className="mb-4 text-muted">{regeneratingKey.name}</p>}
+        <form onSubmit={(e) => void handleRegenerateSubmit(e)}>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="tertiary"
+              type="button"
+              onClick={() => {
+                setShowRegenerateModal(false);
+                setRegeneratingKey(null);
+              }}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" disabled={regenerateSubmitting}>
+              {regenerateSubmitting ? t('common.loading') : t('apiKeys.regenerate')}
+            </Button>
+          </div>
+        </form>
       </Modal>
 
       <Modal isOpen={secret !== null} onClose={() => setSecret(null)} title={t('apiKeys.secretTitle')}>
