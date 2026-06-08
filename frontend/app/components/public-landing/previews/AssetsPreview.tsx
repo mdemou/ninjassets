@@ -69,9 +69,7 @@ export function AssetsPreview() {
                   <p className="truncate text-[0.6875rem] font-medium">{asset.name}</p>
                   <p className="truncate text-[0.625rem] text-muted">{asset.meta}</p>
                 </div>
-                <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-[0.5625rem] font-medium ${asset.statusClass}`}
-                >
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-[0.5625rem] font-medium ${asset.statusClass}`}>
                   {asset.status}
                 </span>
               </div>
