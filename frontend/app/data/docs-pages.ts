@@ -32,6 +32,7 @@ export const docsSections: DocSection[] = [
       { id: 'handover', label: 'Handover & Custody' },
       { id: 'import-export', label: 'Import & Export' },
       { id: 'webhooks', label: 'Webhooks & Integrations' },
+      { id: 'ai-assistant', label: 'AI Assistant' },
     ],
   },
   {
@@ -55,13 +56,13 @@ const pages: DocPage[] = [
     content: `
 # Introduction
 
-> The self-hosted IT Asset Management platform for teams who need control.
+> Self-hosted IT asset management for teams who need control of their data.
 
-**NinjAsset** is an open-source ITAM tool you deploy on your own infrastructure. It gives your team a single place to track every hardware and software asset across its full lifecycle — from receiving it in stock, assigning it to a person, sending it for maintenance, and eventually retiring it.
+**NinjAsset** is an open-source ITAM platform you deploy on your own infrastructure: inventory lifecycle, sites and maps, verified custody, bulk assign and import/export, data-quality alerts, audit history, API keys and webhooks, and an optional admin AI assistant.
 
 ## Why NinjAsset?
 
-Most ITAM tools are SaaS products that store your inventory data on someone else's servers. NinjAsset flips this: you run it on your own server, your own rules, your own data.
+Most ITAM tools are SaaS products that store your inventory on someone else's servers. NinjAsset runs on your server — your rules, your data.
 
 | | NinjAsset | Typical SaaS |
 |---|---|---|
@@ -72,43 +73,46 @@ Most ITAM tools are SaaS products that store your inventory data on someone else
 
 ## Key features
 
-- **Asset inventory** — Lifecycle states (Stock → Assigned → Maintenance → Archived), admin CRUD, and a read-only personal view for assignees.
-- **Sites & maps** — Offices and data centers with interactive Leaflet maps. Assets inherit coordinates from their site.
-- **Verified custody** — Email magic-link handovers that require the recipient to confirm online, plus printable checkout receipts with signature upload.
-- **ITAM catalog** — Manufacturers, vendors, and asset categories with per-category custom fields (JSONB).
-- **Media & QR** — Asset photos, auto-generated QR codes, and printable label sheets.
-- **Data quality & alerts** — Computed hygiene rules that surface gaps (missing serial, no assignee, overdue warranty) with an admin notification bell.
-- **Audit history** — Every mutation is logged. Admins see the full ledger; users see their own history.
-- **API automation** — Bearer API keys for headless integrations and CI scripts.
-- **Webhooks / Integrations** — Slack, Discord, and Telegram destinations that fire on domain events.
-- **Bulk import/export** — Migrate from spreadsheets or other ITAM tools with a dry-run gate.
+- **Asset inventory** — Lifecycle states (\`STOCK\`, \`ASSIGNED\`, \`MAINTENANCE\`, \`ARCHIVED\`), admin CRUD, and a personal read-only view for assignees.
+- **Sites & maps** — Offices and data centers with Leaflet (OpenStreetMap); assets inherit or override coordinates.
+- **Verified custody** — Email magic-link handovers and printable checkout/check-in receipts (generate PDF, collect signatures, upload scanned copy).
+- **ITAM catalog** — Manufacturers, vendors, and categories with per-category custom fields.
+- **Media & QR** — Asset images, QR codes, and label printing.
+- **Data quality & alerts** — Computed hygiene rules, reports, an admin notification bell, and dismissals (discard/undo without editing assets).
+- **Bulk assign** — Multi-asset checkout/return from the assets list, with optional verified handover per asset and batch custody PDF.
+- **Audit history** — Admin-wide transaction log and per-user “My History”.
+- **Dashboards** — Admin overview (KPIs, charts, map) and a personal workspace.
+- **API automation** — Bearer API keys for machine access to admin endpoints.
+- **Webhooks / Integrations** — Slack, Discord, and Telegram on domain events.
+- **Bulk import/export** — Admin hub at \`/admin/import-export\` with column mapping, mandatory dry-run, and async jobs.
+- **AI assistant** — Admin-only RAG chat at \`/admin/ai\` with streamed answers and source citations (EN/ES UI).
+- **Auth & profile** — Registration, email verification, password reset, lockout, settings; admins can reset passwords from the user directory.
 
-## Architecture overview
+## Tech stack
 
-\`\`\`
-Browser (React SPA :3000)
-    │  /api proxy
-    ▼
-Hapi API (:3001)
-    ├── PostgreSQL 16
-    └── Redis 7  (webhooks · email · import/export jobs)
-\`\`\`
+| Layer | Technologies |
+|---|---|
+| Frontend | React 19, React Router 7 (SPA), Tailwind CSS v4, Leaflet, Recharts |
+| Backend | Node.js, Hapi, Knex, PostgreSQL |
+| AI assistant | Python FastAPI (\`aiagent\`), Qdrant, CPU embeddings (\`multilingual-e5-base\`), configurable LLM |
+| Jobs | Redis queues (webhooks, email, import/export) plus a Redis-backed periodic scheduler |
 
-The frontend and backend are separate Node.js packages. Both can run with \`npm run dev\` locally or as Docker images in production.
+Admin routes use \`/api/p/*\`; personal routes use \`/api/me/*\`.
 
 ## Web UI entry points
 
 | URL | Purpose |
 |---|---|
-| \`/\` | Public marketing landing (features, docs links, **Get started** / **Log in** CTAs) |
+| \`/\` | Public marketing landing (no API calls, no login/signup links) |
 | \`/docs\` | This documentation (header includes **Sign in** → \`/login\`) |
 | \`/login\` | Email/password sign-in; register link when signup is enabled |
 | \`/register\` | Self-service registration (when \`SIGNUP_ENABLED\` is not \`false\`) |
 
 ## Next steps
 
-- [Installation](/docs/getting-started/installation) — Get NinjAsset running in minutes.
-- [Self-Hosting](/docs/getting-started/self-hosting) — Production deployment with Docker Compose.
+- [Installation](/docs/getting-started/installation) — Start the full stack with Docker Compose.
+- [Self-Hosting](/docs/getting-started/self-hosting) — Images, volumes, upgrades, and production checklist.
+- [AI Assistant](/docs/features/ai-assistant) — Enable RAG chat and populate Qdrant.
 - [API Reference](/docs/api-reference/introduction) — Automate NinjAsset from scripts or CI.
 `,
   },
@@ -120,259 +124,41 @@ The frontend and backend are separate Node.js packages. Both can run with \`npm 
     content: `
 # Installation
 
-NinjAsset requires **Node.js 20+**, **PostgreSQL 16**, and **Redis 7**. The fastest way to run PostgreSQL and Redis locally is with the included Docker Compose file.
-
 ## Prerequisites
 
-| Requirement | Version |
-|---|---|
-| Node.js | 20 or later |
-| npm | 9 or later |
-| Docker (optional) | 24 or later |
-| PostgreSQL | 16 |
-| Redis | 7 |
+- **Docker** and Docker Compose
 
 ## Quick start
 
-### 1. Clone the repository
-
-\`\`\`bash
-git clone https://github.com/mdemou/ninjassets.git
-cd ninjasset
-\`\`\`
-
-### 2. Set up environment variables
+1. Copy the example env files (backend **and** aiagent) and edit values as needed:
 
 \`\`\`bash
 cp backend/.env.example backend/.env
-# optional — defaults work for local dev
-cp frontend/.env.example frontend/.env
+cp aiagent/.env.example aiagent/.env
 \`\`\`
 
-Open \`backend/.env\` and set at minimum:
+At minimum, set strong \`JWT_ADMIN_SECRET_KEY\` and \`JWT_USER_SECRET_KEY\` in \`backend/.env\`. Keep \`REDIS_PASSWORD\` in sync with \`docker-compose.yml\` (default \`your_secure_password\`). For the AI assistant, set \`AI_ASSISTANT_ENABLED=true\`, \`GROK_API_KEY\`, and matching \`AI_AGENT_API_KEY\` in both env files — see [Self-Hosting](/docs/getting-started/self-hosting) for details.
 
-\`\`\`dotenv
-DATABASE_URL=postgres://ninjasset:ninjasset@localhost:5432/ninjasset
-REDIS_HOST=localhost
-JWT_ADMIN_SECRET_KEY=change-me-admin-secret
-JWT_USER_SECRET_KEY=change-me-user-secret
-FRONTEND_URL=http://localhost:3000
-\`\`\`
-
-### 3. Start infrastructure
+2. Start the stack:
 
 \`\`\`bash
-docker compose --env-file backend/.env up -d postgres redis-server
+docker compose -f docker-compose.yml up
 \`\`\`
 
-This starts **PostgreSQL** and **Redis** only. The app runs outside Docker during development.
+- **App:** [http://localhost:3000](http://localhost:3000)
+- **API (direct):** [http://localhost:3001](http://localhost:3001)
 
-For the **AI assistant**, also start Qdrant and run \`aiagent\` on the host (see [aiagent/README.md](https://github.com/mdemou/ninjassets/blob/main/aiagent/README.md)):
+The backend image runs migrations on startup. Add \`-d\` to run detached.
+
+3. If you enabled the AI assistant, populate Qdrant from this repo checkout (once, or after editing specs/docs/API):
 
 \`\`\`bash
-docker compose --env-file backend/.env up -d qdrant
-cp aiagent/.env.example aiagent/.env   # set GROK_API_KEY
-cd aiagent && uv sync && uv run uvicorn ai_service.main:app --reload
+cd aiagent
+uv sync
+uv run python -m ai_service.jobs.reindex
 \`\`\`
 
-Set \`AI_ASSISTANT_ENABLED=true\` in \`backend/.env\`.
-
-### 4. Start the API
-
-\`\`\`bash
-cd backend
-npm install
-npm run migrate      # run all Knex migrations
-npm run dev          # starts on :3001
-\`\`\`
-
-Optional — seed demo data:
-
-\`\`\`bash
-npm run seed         # minimal seed
-npm run seed:demo    # rich demo data with assets, users, and handovers
-\`\`\`
-
-### 5. Start the frontend
-
-Open a second terminal:
-
-\`\`\`bash
-cd frontend
-npm install
-npm run dev          # starts on :3000
-\`\`\`
-
-Open [http://localhost:3000](http://localhost:3000) and use **Log in** or **Get started** on the landing page, or go directly to [http://localhost:3000/login](http://localhost:3000/login). Sign in with the seeded admin credentials printed by \`npm run seed\`.
-
-## Environment variables reference
-
-Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **application defaults** from \`backend/src/config/config.ts\` when a variable is unset. \`DATABASE_URL\` is used by Knex migrations and Docker Compose but is not read by the runtime config object (the app uses \`DB_*\` fields). E2E tests use a separate \`e2e/.env\` (PostgreSQL + Redis only); the frontend dev server optionally uses \`frontend/.env\` (\`PORT\`, \`API_URL\`).
-
-### Database
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`DATABASE_URL\` | PostgreSQL URL for Knex migrations / Compose (not used by runtime \`config.db\`) | — (see \`backend/.env.example\`) |
-| \`DB_USER\` | PostgreSQL user | \`postgres\` |
-| \`DB_PASSWORD\` | PostgreSQL password | \`postgres\` |
-| \`DB_HOST\` | PostgreSQL host | \`localhost\` |
-| \`DB_PORT\` | PostgreSQL port | \`5432\` |
-| \`DB_NAME\` | PostgreSQL database name | \`ninjasset\` |
-
-### Redis
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`REDIS_HOST\` | Redis hostname | \`localhost\` |
-| \`REDIS_PORT\` | Redis port | \`6379\` |
-| \`REDIS_PASSWORD\` | Redis password (empty = no auth) | \`""\` |
-| \`REDIS_DB\` | Redis logical database index | \`0\` |
-
-**Hardcoded in \`config.ts\` (not environment variables):**
-
-| Config path | Purpose | Value |
-|---|---|---|
-| \`config.db.redis.queues.notifications\` | Unified notification job queue (webhooks + email) | \`ninjasset:notifications\` |
-| \`config.db.redis.queues.notificationsProcessing\` | In-flight list for BRPOPLPUSH at-least-once delivery | \`ninjasset:notifications:processing\` |
-| \`config.db.redis.queues.importExportJobs\` | Import/export job wakeup queue | \`ninjasset:import-export\` |
-| \`config.notifications.dedupKeyPrefix\` | Redis key prefix for delivery deduplication | \`ninjasset:notif:dedup:\` |
-| \`config.maintenance.keyPrefix\` | Redis prefix for scheduler last-run timestamps and locks | \`ninjasset:sched:\` |
-
-### Server
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`PORT\` | API listen port | \`3001\` |
-| \`HOST\` | API bind address | \`0.0.0.0\` |
-| \`LOG_LEVEL\` | Application log level | \`info\` |
-| \`ADMIN_PAGE_SIZE\` | Server-side page size for paginated list endpoints | \`20\` |
-
-### Authentication & sessions
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`JWT_ADMIN_SECRET_KEY\` | Signs admin JWT session tokens | \`admin-secret-dev\` |
-| \`JWT_USER_SECRET_KEY\` | Signs user JWT session tokens | \`user-secret-dev\` |
-| \`SIGNUP_ENABLED\` | Self-service registration (\`false\` disables API + register UI) | \`true\` |
-| \`RECAPTCHA_SECRET_KEY\` | Google reCAPTCHA secret for registration | \`""\` |
-| \`MOCK_CAPTCHA\` | Skip captcha validation (dev/test only) | \`false\` |
-| \`EMAIL_VERIFICATION_EXPIRY_HOURS\` | Email verification token TTL | \`24\` |
-| \`PASSWORD_RESET_EXPIRY_HOURS\` | Password reset token TTL | \`1\` |
-| \`HANDOVER_TOKEN_EXPIRY_HOURS\` | Custody handover magic-link TTL | \`72\` |
-| \`ACCOUNT_LOCKOUT_MAX_ATTEMPTS\` | Failed logins before lockout | \`5\` |
-| \`ACCOUNT_LOCKOUT_DURATION_MS\` | Lockout duration in milliseconds | \`900000\` (15 min) |
-
-### URLs
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`FRONTEND_URL\` | Base URL for links in emails (verification, reset, handover) | \`http://localhost:3000\` |
-| \`BACKEND_URL\` | Public API base URL (e.g. QR asset links) | \`http://localhost:3001\` |
-
-### Email (SMTP)
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`SMTP_HOST\` | SMTP server host (empty = log to console when not mocking) | \`""\` |
-| \`SMTP_PORT\` | SMTP port | \`587\` |
-| \`SMTP_SECURE\` | Use TLS (\`true\` / \`false\`) | \`false\` |
-| \`SMTP_USER\` | SMTP username | \`""\` |
-| \`SMTP_PASS\` | SMTP password | \`""\` |
-| \`SMTP_FROM\` | Default From address | \`noreply@example.com\` |
-| \`MOCK_EMAIL\` | Log outbound mail to console instead of SMTP | \`false\` |
-
-### File uploads & storage paths
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`AVATAR_STORAGE_PATH\` | User avatar files on disk | \`./uploads/avatars\` |
-| \`ASSET_IMAGE_STORAGE_PATH\` | Asset image files on disk | \`./uploads/asset-images\` |
-| \`MANUFACTURER_IMAGE_STORAGE_PATH\` | Manufacturer logo files | \`./uploads/manufacturer-images\` |
-| \`VENDOR_IMAGE_STORAGE_PATH\` | Vendor logo files | \`./uploads/vendor-images\` |
-| \`ASSET_QR_PNG_SIZE\` | PNG edge length for on-demand asset QR codes | \`512\` |
-
-### Custody receipts
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`CUSTODY_DOCUMENT_STORAGE_PATH\` | Signed custody PDF storage (raw bytes, no image pipeline) | \`./uploads/custody-documents\` |
-| \`CUSTODY_DOCUMENT_MAX_BYTES\` | Max upload size for a signed custody PDF | \`10485760\` (10 MB) |
-| \`CUSTODY_ORG_NAME\` | Organization name on generated receipt header | \`ninjasset\` |
-| \`CUSTODY_ORG_LOGO_PATH\` | Optional logo image path on receipts (empty = omit) | \`""\` |
-
-### API keys & machine access
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`API_KEY_PREFIX\` | Visible prefix on new API key secrets | \`nsk_live_\` |
-| \`API_KEY_DEFAULT_TTL_DAYS\` | Default expiry when creating keys (\`0\` = no expiry) | \`0\` |
-| \`API_KEY_LAST_USED_THROTTLE_SEC\` | Throttle writes to \`last_used_at\` on hot keys | \`60\` |
-| \`API_ACCESS_LOG_RETENTION_DAYS\` | Days to retain API access log entries | \`90\` |
-| \`API_IDEMPOTENCY_TTL_HOURS\` | TTL for idempotency keys on mutating requests | \`24\` |
-
-### Webhooks (Slack / Discord / Telegram)
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`WEBHOOKS_ENABLED\` | Master switch for webhook dispatcher and alert scan | \`true\` |
-| \`WEBHOOK_HTTP_TIMEOUT_MS\` | Outbound HTTP timeout per delivery | \`5000\` |
-| \`WEBHOOK_ALLOWED_SLACK_HOSTS\` | Comma-separated SSRF allowlist for Slack | \`hooks.slack.com\` |
-| \`WEBHOOK_ALLOWED_DISCORD_HOSTS\` | Comma-separated SSRF allowlist for Discord | \`discord.com,discordapp.com,ptb.discord.com,canary.discord.com\` |
-| \`WEBHOOK_TELEGRAM_API_BASE\` | Telegram Bot API base URL | \`https://api.telegram.org\` |
-| \`WEBHOOK_ALLOW_INSECURE_TARGETS\` | Allow \`http\` and loopback targets (dev/test only) | \`false\` |
-| \`WEBHOOK_ALERT_SCAN_INTERVAL_MS\` | Interval for data-quality \`alert.raised\` scan | \`3600000\` (1 h) |
-
-### Notifications pipeline
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`NOTIFICATIONS_ENABLED\` | Consumer + reaper (independent of \`WEBHOOKS_ENABLED\`) | \`true\` |
-| \`NOTIFICATIONS_DEDUP_TTL_SEC\` | Dedup key TTL in seconds | \`86400\` |
-| \`NOTIFICATIONS_REAPER_INTERVAL_MS\` | How often stale in-flight jobs are reclaimed | \`15000\` |
-| \`NOTIFICATIONS_VISIBILITY_TIMEOUT_MS\` | Processing visibility timeout | \`60000\` |
-| \`NOTIFICATIONS_MAX_RETRIES\` | Max delivery attempts per job | \`5\` |
-| \`NOTIFICATIONS_BLOCK_SECONDS\` | BRPOPLPUSH block time (shutdown responsiveness) | \`5\` |
-
-### Bulk import / export
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`IMPORT_EXPORT_ENABLED\` | In-process import/export worker | \`true\` |
-| \`IMPORT_STORAGE_PATH\` | Uploads and generated artifacts on disk | \`./uploads/import-export\` |
-| \`IMPORT_MAX_FILE_BYTES\` | Max upload size per import file | \`20971520\` (20 MB) |
-| \`IMPORT_MAX_ROWS\` | Max rows processed per import job | \`50000\` |
-| \`IMPORT_ARTIFACT_RETENTION_DAYS\` | Auto-delete artifacts after N days | \`7\` |
-| \`IMPORT_WORKER_BLOCK_SECONDS\` | BLPOP block for event-driven worker | \`5\` |
-| \`IMPORT_SAFETY_SWEEP_MS\` | DB sweep when Redis wakeup was missed | \`30000\` |
-| \`IMPORT_EXPORT_NOTIFY_ON_COMPLETE\` | Email admin when a long job completes | \`false\` |
-
-### Admin AI assistant
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`AI_ASSISTANT_ENABLED\` | Feature flag — assistant is off unless \`true\` | \`false\` |
-| \`MOCK_AI\` | Canned SSE from backend (no aiagent); E2E/dev only | \`false\` |
-| \`AI_AGENT_URL\` | Base URL of the aiagent RAG service | \`http://localhost:8000\` |
-| \`AI_AGENT_API_KEY\` | Shared secret sent as \`X-Internal-Key\` header | \`""\` |
-| \`AI_TOP_K\` | Retrieval top-K for RAG context | \`5\` |
-| \`AI_MESSAGE_MAX_LENGTH\` | Max user message length (characters) | \`2000\` |
-| \`AI_MESSAGE_MIN_LENGTH\` | Min user message length (characters) | \`3\` |
-| \`AI_HISTORY_MESSAGES\` | Last N messages sent to the LLM as context | \`6\` |
-| \`AI_RATE_LIMIT_PER_HOUR\` | Messages per admin per hour (Redis fixed window) | \`30\` |
-| \`AI_AGENT_TIMEOUT_MS\` | Upstream SSE request timeout | \`60000\` |
-
-### Periodic maintenance (scheduler)
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \`MAINTENANCE_TICK_MS\` | Scheduler tick interval | \`5000\` |
-| \`MAINTENANCE_LOCK_TTL_SEC\` | Redis lock TTL if a runner dies mid-job | \`300\` |
-| \`TOKEN_CLEANUP_INTERVAL_MS\` | Expired session/token cleanup cadence | \`21600000\` (6 h) |
-| \`API_RETENTION_PURGE_INTERVAL_MS\` | API access log purge cadence | \`21600000\` (6 h) |
-| \`IMPORT_ARTIFACT_PURGE_INTERVAL_MS\` | Import artifact purge cadence | \`21600000\` (6 h) |
-
-> **Production:** Change JWT secrets, database passwords, and \`API_KEY_PREFIX\` (\`nsk_live_\` vs \`nsk_test_\`). Never set \`MOCK_CAPTCHA\`, \`MOCK_EMAIL\`, \`MOCK_AI\`, or \`WEBHOOK_ALLOW_INSECURE_TARGETS\` in production.
+\`aiagent/.env\` should use \`QDRANT_URL=http://localhost:6333\` (the default in \`.env.example\`). See [AI Assistant](/docs/features/ai-assistant) for more.
 `,
   },
 
@@ -383,104 +169,53 @@ Copy \`backend/.env.example\` to \`backend/.env\`. Values below are **applicatio
     content: `
 # Self-Hosting
 
-This guide covers running NinjAsset in a production-like environment using Docker Compose.
+Full stack from published images: PostgreSQL, Redis, Qdrant, **aiagent** (AI RAG service), backend API, and nginx frontend.
 
-## Production Docker Compose
-
-The repo ships a full \`docker-compose.yml\`: PostgreSQL, Redis, **Qdrant**, **aiagent** (RAG service), backend, and frontend.
-
-\`\`\`bash
-cp backend/.env.example backend/.env
-cp aiagent/.env.example aiagent/.env
-# backend: AI_ASSISTANT_ENABLED=true, AI_AGENT_API_KEY=...
-# aiagent: GROK_API_KEY=..., same AI_AGENT_API_KEY
-
-docker compose --env-file backend/.env pull
-docker compose --env-file backend/.env up -d
-\`\`\`
+## Services
 
 | Service | Image | Notes |
-|---|---|---|
-| \`postgres\`, \`redis-server\` | Official images | Persistent volumes |
-| \`qdrant\` | \`qdrant/qdrant\` | Vector store for RAG |
-| \`aiagent\` | \`ghcr.io/<owner>/ninjasset-aiagent\` | ~2 GB (deps only); embedding model via volume |
-| \`backend\` | \`ghcr.io/<owner>/ninjasset-backend\` | Migrations on startup; \`/app/uploads\` volume |
-| \`frontend\` | \`ghcr.io/<owner>/ninjasset-frontend\` | nginx on port 3000 |
+| --- | --- | --- |
+| \`postgres\`, \`redis-server\` | Official images | Data store and job queues |
+| \`qdrant\` | \`qdrant/qdrant\` | Vector store for the assistant |
+| \`aiagent\` | \`ghcr.io/<owner>/ninjasset-aiagent\` | ~2 GB image (deps only); embedding model via volume |
+| \`backend\`, \`frontend\` | \`ghcr.io/<owner>/ninjasset-{backend,frontend}\` | API + SPA |
 
-**Embedding model:** the aiagent image does not include the ~1.1 GB Hugging Face weights. Compose bind-mounts \`~/.cache/huggingface\` by default (override with \`HF_CACHE_DIR\` in a \`.env\` next to \`docker-compose.yml\`).
+Compose overrides container networking — you do **not** need to set these manually in \`backend/.env\`:
 
-Images are published on version tags (\`v*\`) to GitHub Container Registry. Log in with \`docker login ghcr.io\` if packages are private.
+| Variable | Value inside Compose |
+| --- | --- |
+| \`DB_HOST\` | \`postgres\` |
+| \`REDIS_HOST\` | \`redis-server\` |
+| \`DATABASE_URL\` | \`postgres://<DB_USER>:<DB_PASSWORD>@postgres:5432/<DB_NAME>\` |
+| \`AI_AGENT_URL\` | \`http://aiagent:8000\` |
+| \`QDRANT_URL\` (aiagent) | \`http://qdrant:6333\` |
 
-## Building production images locally
+## Embedding model volume
 
-\`\`\`bash
-docker build -t ninjasset-backend backend/
-docker build -t ninjasset-frontend frontend/
-docker build -t ninjasset-aiagent aiagent/
-\`\`\`
+The aiagent image does not include the ~1.1 GB Hugging Face weights (\`intfloat/multilingual-e5-base\`). Compose bind-mounts a host cache into the container (\`HF_HOME=/models/hf\`); default host path is \`~/.cache/huggingface\`. Override with \`HF_CACHE_DIR\` in a root \`.env\` file.
 
-Or build backend/frontend on the host with \`npm run build\` and set \`NODE_ENV=production\`.
-
-## Running database migrations
-
-Run migrations once on first deploy, and again after each upgrade:
+Pre-download on the host (optional — same path the container uses, faster first start):
 
 \`\`\`bash
-cd backend && npm run migrate
+cd aiagent
+uv sync
+uv run python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
 \`\`\`
 
-## Reverse proxy (nginx example)
+If the cache directory is missing or empty, \`entrypoint.sh\` downloads the model on first container start (several minutes; healthcheck \`start_period\` allows up to 5 minutes). Later starts reuse the mounted cache.
 
-Place NinjAsset behind nginx and terminate TLS there:
-
-\`\`\`nginx
-server {
-    listen 443 ssl;
-    server_name ninjasset.example.com;
-
-    ssl_certificate     /etc/ssl/certs/cert.pem;
-    ssl_certificate_key /etc/ssl/private/key.pem;
-
-    # Frontend SPA
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-    }
-
-    # API (proxied by the SPA dev server in dev; direct in prod)
-    location /api {
-        proxy_pass http://localhost:3001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-\`\`\`
-
-## Security checklist
-
-- Set strong random values for \`JWT_ADMIN_SECRET_KEY\` and \`JWT_USER_SECRET_KEY\` (32+ chars).
-- Never commit \`backend/.env\`, \`e2e/.env\`, or \`frontend/.env\` to version control.
-- Use a dedicated PostgreSQL user with access only to the \`ninjasset\` database.
-- Enable TLS on your reverse proxy.
-- Consider setting \`SIGNUP_ENABLED=false\` after initial user creation.
-- Rotate API keys periodically via **Admin → API Keys → Regenerate**.
-
-## Health checks
-
-The backend exposes two endpoints for liveness/readiness probes:
-
-| Path | Purpose |
-|---|---|
-| \`GET /health/live\` | Process is alive (always 200 if running) |
-| \`GET /health/ready\` | Database and Redis reachable |
-
-Use these in Docker health checks or Kubernetes probes.
+Named volumes persist PostgreSQL data, Qdrant vectors, and backend uploads.
 
 ## Upgrading
 
-1. Pull the new image or \`git pull\`.
-2. Run \`npm run migrate\` (backend) — migrations are always additive and safe to replay.
-3. Restart the services.
+After a new release (version tag on GitHub), refresh images:
+
+\`\`\`bash
+docker compose -f docker-compose.yml pull
+docker compose -f docker-compose.yml up -d
+\`\`\`
+
+Images (\`ninjasset-backend\`, \`ninjasset-frontend\`, \`ninjasset-aiagent\`) are published to GitHub Container Registry on version tags (\`v*\`). If the packages are private, log in first: \`docker login ghcr.io\`.
 `,
   },
 
@@ -540,12 +275,13 @@ The asset list supports real-time full-text search across name, serial, and note
 
 To check out an asset to a person, open the asset detail and use the **Handover** tab. NinjAsset sends the recipient an email with a magic link to confirm custody. See [Handover & Custody](/docs/features/handover) for details.
 
-## Bulk operations
+## Bulk assign
 
 From the asset list, select multiple assets and use the bulk toolbar to:
 
-- **Bulk checkout** — Assign multiple assets to the same person with a single handover flow.
+- **Bulk checkout** — Assign multiple assets to the same person (direct assignment or verified handover per asset).
 - **Bulk check-in** — Return multiple assets at once.
+- **Batch custody PDF** — Generate a single printable receipt covering the selection.
 
 ## QR codes and labels
 
@@ -577,13 +313,9 @@ If the recipient does not confirm within the expiry window, the handover can be 
 
 ## Custody receipts
 
-After a handover is accepted, admins can generate a **printable custody receipt** — a PDF document showing:
+Admins can generate **printable checkout/check-in receipts** — PDF documents showing asset details (name, serial, photo, QR code), dates, and signature areas for physical sign-off.
 
-- Asset details (name, serial, photo, QR code)
-- Handover date and recipient
-- Signature area for physical sign-off
-
-Upload the signed PDF back to the asset record as a custody document for your audit trail.
+Collect signatures offline, then upload the scanned PDF back to the asset record as a custody document for your audit trail.
 
 ## Bulk handovers
 
@@ -728,7 +460,7 @@ Each destination can subscribe to any combination of events. Toggle the events y
 ### Alert events
 | Event | Fired when |
 |---|---|
-| \`alert.triggered\` | A data-quality alert fires |
+| \`alert.raised\` | A new data-quality issue is detected (periodic scan) |
 
 ## Payload format
 
@@ -750,6 +482,62 @@ All events share the same envelope:
 ## Delivery
 
 Webhooks are delivered asynchronously via a Redis-backed job queue. Failed deliveries are retried with exponential back-off. You can inspect delivery history per destination in the Integrations admin panel.
+`,
+  },
+
+  {
+    section: 'features',
+    page: 'ai-assistant',
+    title: 'AI Assistant',
+    content: `
+# AI Assistant
+
+Admin-only RAG chat at **Admin → AI** (\`/admin/ai\`). The backend owns conversations and proxies to the stateless **aiagent** service (FastAPI + Qdrant + local embeddings + external LLM). Answers stream over SSE with source citations; UI is available in English and Spanish.
+
+## Enable the assistant
+
+1. In \`backend/.env\`: \`AI_ASSISTANT_ENABLED=true\` and \`AI_AGENT_API_KEY\` (shared secret).
+2. In \`aiagent/.env\`: \`GROK_API_KEY\` (or your configured LLM provider) and the same \`AI_AGENT_API_KEY\`.
+3. Start the full stack with Docker Compose (includes Qdrant and aiagent).
+
+Compose sets \`AI_AGENT_URL=http://aiagent:8000\` and \`QDRANT_URL=http://qdrant:6333\` inside containers — you do not need to change those for the default stack.
+
+## Populate Qdrant (required)
+
+The assistant cannot answer until the corpus is indexed. Run from your **repo checkout** (the published aiagent image does not bundle specs or docs):
+
+\`\`\`bash
+cd aiagent
+uv sync
+uv run python -m ai_service.jobs.reindex
+\`\`\`
+
+Use \`QDRANT_URL=http://localhost:6333\` in \`aiagent/.env\` while Qdrant is exposed by Compose.
+
+Re-run after editing feature specs (\`docs/spec-*.md\`), this documentation (\`frontend/app/data/docs-pages.ts\`), or the exported API schema (\`docs/openapi.json\`).
+
+### Alternative triggers
+
+- **HTTP** (when aiagent runs locally with corpus access): \`POST /knowledge/reindex\` with header \`X-Internal-Key: <AI_AGENT_API_KEY>\`.
+- **Auto-index** — \`AI_AUTO_INDEX_ON_START=true\` indexes when the collection is empty, but only when corpus files are visible to the process (local \`uvicorn\`, not the default Compose aiagent container).
+
+## Embedding model
+
+Weights for \`intfloat/multilingual-e5-base\` (~1.1 GB) are not baked into the Docker image. Compose bind-mounts \`~/.cache/huggingface\` by default. Pre-download on the host for a faster first start — see [Self-Hosting](/docs/getting-started/self-hosting).
+
+On first container start with an empty cache, \`entrypoint.sh\` downloads the model automatically (allow several minutes). See [Self-Hosting](/docs/getting-started/self-hosting) for the Hugging Face cache volume.
+
+## Privacy
+
+Queries and retrieved context are anonymized (Presidio) **before** the external LLM; streamed answers are deanonymized on the way back. Disable in dev with \`PII_ENABLED=false\` in \`aiagent/.env\`.
+
+## What is indexed
+
+Sources (relative to \`CORPUS_ROOT\`, default repo root):
+
+- \`docs/spec-*.md\` — feature specifications
+- \`frontend/app/data/docs-pages.ts\` — this in-app documentation
+- \`docs/openapi.json\` — HTTP API schema (generated offline from the backend)
 `,
   },
 
