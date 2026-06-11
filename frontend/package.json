@@ -35,7 +35,7 @@
     "@react-router/dev": "^7.17.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/leaflet": "^1.9.21",
-    "@types/react": "^19.2.16",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
